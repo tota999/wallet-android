@@ -1,21 +1,21 @@
 /**
- * Copyright 2019 The Tari Project
+ * Copyright 2020 The Tari Project
  *
  * Redistribution and use in source and binary forms, with or
  * without modification, are permitted provided that the
  * following conditions are met:
-
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  * this list of conditions and the following disclaimer.
-
+ *
  * 2. Redistributions in binary form must reproduce the above
  * copyright notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
-
+ *
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
-
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -30,7 +30,6 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.tari.android.wallet.ui.component
 
 import android.content.Context
@@ -40,13 +39,17 @@ import java.util.*
 /**
  * Custom font enumeration - used in layout files.
  *
- * @author Kutsal Kaan Bilgin
+ * @author The Tari Development Team
  */
 enum class CustomFont(private val fileName: String) {
 
     // font files
+    AVENIR_LT_STD_BLACK("fonts/AvenirLTStd-Black.otf"),
     AVENIR_LT_STD_HEAVY("fonts/AvenirLTStd-Heavy.otf"),
-    AVENIR_NEXT_LT_PRO_REGULAR("fonts/AvenirNextLTPro-Regular.otf");
+    AVENIR_LT_STD_MEDIUM("fonts/AvenirLTStd-Medium.otf"),
+    AVENIR_LT_STD_ROMAN("fonts/AvenirLTStd-Roman.otf"),
+    AVENIR_NEXT_LT_PRO_REGULAR("fonts/AvenirNextLTPro-Regular.otf"),
+    AVENIR_NEXT_LT_PRO_BOLD("fonts/AvenirNextLTPro-Bold.otf");
 
     companion object {
         fun fromString(fontName: String): CustomFont {

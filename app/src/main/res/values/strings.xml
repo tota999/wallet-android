@@ -1,17 +1,97 @@
 <resources>
     <string name="app_name">Tari Wallet</string>
-    <string name="testnet">TESTNET v1.0</string>
 
+    <!-- foreground service description -->
+    <string name="wallet_service_desc">This service is required to communicate with Tari services. Please keep this service running if you want to be able to communicate with the Tari system.</string>
+
+    <!-- digits -->
+    <string name="digit_0">0</string>
+    <string name="digit_1">1</string>
+    <string name="digit_2">2</string>
+    <string name="digit_3">3</string>
+    <string name="digit_4">4</string>
+    <string name="digit_5">5</string>
+    <string name="digit_6">6</string>
+    <string name="digit_7">7</string>
+    <string name="digit_8">8</string>
+    <string name="digit_9">9</string>
+    <string name="digit_decimal_separator_bullet_char">.</string>
+    <string name="digit_thousands_separator">,</string>
+    <string name="digit_decimal_separator">.</string>
+
+    <!-- common -->
+    <string name="common_continue">Continue</string>
+
+    <!-- dummy values - UI design placeholders -->
+    <string name="dummy_positive_tx_value">+ 152.75</string>
+    <string name="dummy_negative_tx_value">- 63.25</string>
+    <string name="dummy_contact_alias">Sarah_D</string>
+    <string name="dummy_contact_initial">S</string>
+    <string name="dummy_message">Thanks again for helping with my move</string>
+    <string name="dummy_emoji">🍀</string>
+    <string name="dummy_balance">124.56</string>
+
+    <!-- emoji-id-related -->
+    <string name="emoji_id_bullet_separator">•••</string>
+    <string name="emoji_id_chunk_separator_char">|</string>
+
+    <!-- service -->
+    <string name="service_title">Tari wallet service is running.</string>
+    <string name="service_description">This service carries out wallet operations across applications.</string>
+
+    <!-- auth -->
+    <string name="testnet">TESTNET v1.0</string>
     <string name="proceed">Proceed</string>
     <string name="exit">Exit</string>
-
     <string name="auth_title">Authentication</string>
     <string name="auth_subtitle">Please use your biometrics or your PIN, pattern or password to authenticate Tari Wallet.</string>
     <string name="auth_description">Authentication secures your Tari Wallet transactions.</string>
-
     <string name="auth_not_available_or_canceled_title">Authentication Error</string>
     <string name="auth_not_available_or_canceled_desc">Tari Wallet was not able to authenticate you. Do you still want to proceed?</string>
-
     <string name="auth_failed_title">Authentication Failed</string>
     <string name="auth_failed_desc">Tari Wallet was not able to authenticate you.</string>
+
+    <!-- home -->
+    <string name="home_available_balance">Available Balance</string>
+    <string name="home_today">Today</string>
+    <string name="home_yesterday">Yesterday</string>
+    <string name="home_send_tari">Send Tari</string>
+    <string name="home_txs">Transactions</string>
+    <string name="home_pending_txs">Pending Transactions</string>
+    <!-- test -->
+    <string name="home_test_data_warning">Please wait.\n\nWallet is generating test data.</string>
+    <!-- create emoji id-->
+    <string name="create_emoji_id_hello_friend_label">Hello Friend</string>
+    <string name="create_emoji_id_just_a_sec_label">Just a sec...</string>
+    <string name="create_emoji_id_just_sec_desc_text">Your wallet is being created</string>
+    <string name="create_emoji_id_wallet_address_desc">Your Emoji ID is your wallet address. \n It’s how your friends can find you and send you Tari.</string>
+    <string name="create_emoji_id_now_text">Now create your Emoji ID</string>
+    <string name="create_emoji_id_awesome">Awesome!</string>
+
+    <string name="scan_qr_description">Scan Tari QR code in the box below to send a Tari to recipient.</string>
+    <string name="failed_init_camera_message">Failed to initialize Camera</string>
+    <string name="camera_permission_denied_message">Camera permission denied</string>
+
+    <!-- create wallet -->
+    <string name="crypto_wallet_title_text_line_1">A crypto wallet</string>
+    <string name="crypto_wallet_title_text_line_2">that’s easy to use.</string>
+    <string name="crypto_wallet_desc">Tari wallet puts you and your privacy at the core of everything and is still easy to use.</string>
+    <string name="create_wallet">Create a Wallet</string>
+
+    <!-- send tari - add recipient -->
+    <string name="add_recipient_title">Send To</string>
+    <string name="add_recipient_hint">Enter Emoji ID or Contact Name</string>
+    <string name="add_recipient_recent_tx_contacts">Recent</string>
+    <string name="add_recipient_my_contacts">My Contacts</string>
+    <string name="add_recipient_paste_emoji_id">Paste copied Emoji ID</string>
+    <string name="add_recipient_invalid_emoji_id">Invalid Emoji ID</string>
+
+    <!-- send tari - amount -->
+    <string name="add_amount_under_construction">Under Construction</string>
+    <string name="add_amount_not_enough_available_balance">Not enough Tari in your available balance</string>
+    <string name="add_amount_tx_fee">Transaction Fee</string>
+
+    <!-- debug log - title -->
+    <string name="debug_log_title">Log</string>
+
 </resources>

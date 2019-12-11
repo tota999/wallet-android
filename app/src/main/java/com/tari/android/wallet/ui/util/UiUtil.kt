@@ -1,21 +1,21 @@
 /**
- * Copyright 2019 The Tari Project
+ * Copyright 2020 The Tari Project
  *
  * Redistribution and use in source and binary forms, with or
  * without modification, are permitted provided that the
  * following conditions are met:
-
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  * this list of conditions and the following disclaimer.
-
+ *
  * 2. Redistributions in binary form must reproduce the above
  * copyright notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
-
+ *
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
-
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -30,41 +30,39 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.tari.android.wallet.ui.util
 
 import android.app.Activity
+import android.content.ContentResolver
 import android.content.Context
-import android.graphics.BlendMode
-import android.graphics.BlendModeColorFilter
+import android.net.Uri
 import android.os.Handler
-
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.ProgressBar
 import androidx.annotation.NonNull
+import androidx.core.graphics.BlendModeColorFilterCompat
+import androidx.core.graphics.BlendModeCompat
 import java.lang.ref.WeakReference
 
 /**
  * Contains UI utility functions.
  *
- * @author Kutsal Kaan Bilgin
+ * @author The Tari Development Team
  */
-class UiUtil {
+internal object UiUtil {
 
     // enabled view clickability after a disable
     private val clickEnablingHandler = Handler()
 
-    fun setWidthAndHeight(
+    fun setWidth(
         @NonNull view: View,
-        @NonNull newWidth: Int,
-        @NonNull newHeight: Int
+        @NonNull newWidth: Int
     ) {
         if (view.layoutParams is ViewGroup.MarginLayoutParams) {
             val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
             layoutParams.width = newWidth
-            layoutParams.height = newHeight
             view.layoutParams = layoutParams
         }
     }
@@ -80,25 +78,78 @@ class UiUtil {
         }
     }
 
-    fun setLeftMargin(
+    fun setWidthAndHeight(
         @NonNull view: View,
-        @NonNull newLeftMargin: Int
+        @NonNull newWidth: Int,
+        @NonNull newHeight: Int
     ) {
         if (view.layoutParams is ViewGroup.MarginLayoutParams) {
             val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
-            layoutParams.leftMargin = newLeftMargin
+            layoutParams.width = newWidth
+            layoutParams.height = newHeight
+            view.layoutParams = layoutParams
+        }
+    }
+
+    fun getHeight(
+        @NonNull view: View
+    ): Int {
+        val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
+        return layoutParams.height
+    }
+
+    fun setTopMargin(
+        @NonNull view: View,
+        @NonNull newTopMargin: Int
+    ) {
+        if (view.layoutParams is ViewGroup.MarginLayoutParams) {
+            val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
+            layoutParams.topMargin = newTopMargin
+            view.layoutParams = layoutParams
+        }
+    }
+
+    fun setBottomMargin(
+        @NonNull view: View,
+        @NonNull newBottomMargin: Int
+    ) {
+        if (view.layoutParams is ViewGroup.MarginLayoutParams) {
+            val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
+            layoutParams.bottomMargin = newBottomMargin
+            view.layoutParams = layoutParams
+        }
+    }
+
+    fun getBottomMargin(
+        @NonNull view: View
+    ): Int {
+        val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
+        return layoutParams.bottomMargin
+    }
+
+    fun setStartMargin(
+        @NonNull view: View,
+        @NonNull newMargin: Int
+    ) {
+        if (view.layoutParams is ViewGroup.MarginLayoutParams) {
+            val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
+            layoutParams.marginStart = newMargin
             view.layoutParams = layoutParams
         }
     }
 
     fun setProgressBarColor(
-        @NonNull progressBar: ProgressBar,
-        @NonNull color: Int
+        progressBar: ProgressBar,
+        color: Int
     ) {
-        val colorFilter = BlendModeColorFilter(color, BlendMode.SRC_ATOP)
-        progressBar.indeterminateDrawable.mutate().colorFilter = colorFilter
+        progressBar.indeterminateDrawable
+            .mutate().colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+            color,
+            BlendModeCompat.SRC_IN
+        )
     }
 
+    @Suppress("unused")
     fun hideKeyboard(
         @NonNull activity: Activity
     ) {
@@ -144,4 +195,13 @@ class UiUtil {
 
     }
 
+    /**
+     * @param resourceId identifies an application resource
+     * @return the Uri by which the application resource is accessed
+     */
+    fun Context.getResourceUri(resourceId: Int): Uri = Uri.Builder()
+        .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+        .authority(packageName)
+        .path(resourceId.toString())
+        .build()
 }
