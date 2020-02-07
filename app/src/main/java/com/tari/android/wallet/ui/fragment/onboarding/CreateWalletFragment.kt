@@ -33,6 +33,8 @@
 package com.tari.android.wallet.ui.fragment.onboarding
 
 import android.animation.*
+import android.content.Context
+import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
@@ -47,10 +49,19 @@ import com.airbnb.lottie.LottieAnimationView
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
+import com.tari.android.wallet.di.ConfigModule
+import com.tari.android.wallet.di.WalletModule
+import com.tari.android.wallet.ffi.FFICommsConfig
+import com.tari.android.wallet.ffi.FFITestWallet
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.ui.util.UiUtil.getResourceUri
 import com.tari.android.wallet.util.Constants
+import java.lang.Long.max
+import java.lang.RuntimeException
+import java.lang.ref.WeakReference
+import javax.inject.Inject
+import javax.inject.Named
 
 /**
  * onBoarding flow : wallet creation splash screen
@@ -61,14 +72,14 @@ class CreateWalletFragment : BaseFragment() {
 
     @BindView(R.id.create_wallet_tari_wallet)
     lateinit var tariWalletView: LottieAnimationView
-    @BindView(R.id.create_wallet_rootView)
+    @BindView(R.id.create_wallet_vw_root)
     lateinit var rootView: FrameLayout
     @BindView(R.id.create_wallet_title_txt_line_1)
     lateinit var titleTextLine1: TextView
     @BindView(R.id.create_wallet_title_txt_line_2)
     lateinit var titleTextLine2: TextView
-    @BindView(R.id.create_wallet_des_txt)
-    lateinit var walletDesText: TextView
+    @BindView(R.id.create_wallet_desc_txt)
+    lateinit var walletDescText: TextView
     @BindView(R.id.create_wallet_btn)
     lateinit var createWalletButton: TextView
     @BindView(R.id.create_wallet_btn_layout)
@@ -94,7 +105,29 @@ class CreateWalletFragment : BaseFragment() {
     @JvmField
     var whiteColor = 0
 
+    @JvmField
+    @field:[Inject Named(ConfigModule.FieldName.receiveFromAnonymous)]
+    var createNewWalletReceiveFromAnonymous: Boolean = false
+    @JvmField
+    @field:[Inject Named(ConfigModule.FieldName.generateTestData)]
+    var createNewWalletGenerateTestData: Boolean = false
+
+    @Inject
+    @Named(WalletModule.FieldName.walletLogFilePath)
+    lateinit var walletLogFilePath: String
+    @Inject
+    @Named(WalletModule.FieldName.walletFilesDirPath)
+    lateinit var walletFilesDirPath: String
+    @Inject
+    internal lateinit var commsConfig: FFICommsConfig
+
+    private var listener: Listener? = null
+
     private val uiHandler = Handler()
+    private val wr = WeakReference(this)
+
+    private val halfSecondMs = 500L
+    private val createWalletArtificalDelay = Constants.UI.CreateWallet.tariTextAnimViewDurationMs
 
     override val contentViewId = R.layout.fragment_create_wallet
 
@@ -105,22 +138,25 @@ class CreateWalletFragment : BaseFragment() {
     }
 
     private fun showCreateEmojiIdFragment() {
-        activity?.supportFragmentManager?.beginTransaction()
-            ?.replace(R.id.onboarding_create_emoji_id_container, CreateEmojiIdFragment())?.commit()
-
-        removeCurrentFragment()
+        listener?.onCreateEmojiIdButtonClick()
     }
 
-    private fun removeCurrentFragment() {
-        uiHandler.postDelayed({
-            activity?.supportFragmentManager?.beginTransaction()
-                ?.remove(this)?.commit()
-        }, Constants.UI.CreateWallet.removeFragmentDelayDuration)
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (activity is Listener) {
+            listener = activity as Listener
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        listener = null
     }
 
     override fun onStart() {
         super.onStart()
-        videoView.setVideoURI(context!!.getResourceUri(R.raw.splash_video_loop_1))
+        videoView.setVideoURI(context!!.getResourceUri(R.raw.purple_orb))
+        videoView.setOnPreparedListener { mp -> mp.isLooping = true }
         videoView.start()
     }
 
@@ -159,9 +195,54 @@ class CreateWalletFragment : BaseFragment() {
         UiUtil.temporarilyDisableClick(createWalletButton)
         createWalletButton.visibility = View.GONE
         progressBar.visibility = View.VISIBLE
-        uiHandler.postDelayed({
-            startTariWalletViewAnimation()
-        }, Constants.UI.CreateWallet.tariTextAnimViewDurationMs)
+        AsyncTask.execute {
+            wr.get()?.createWallet()
+        }
+    }
+
+    /**
+     * Create new wallet.
+     */
+    private fun createWallet() {
+        try {
+            val startTime = System.currentTimeMillis()
+            val wallet = FFITestWallet(commsConfig, walletLogFilePath)
+            // set the singleton
+            FFITestWallet.instance = wallet
+            if (createNewWalletReceiveFromAnonymous) {
+                for (i in 0 until 3) {
+                    if (!wallet.testReceiveTx()) {
+                        throw RuntimeException()
+                    }
+                    Thread.sleep(halfSecondMs)
+                }
+            }
+            if (createNewWalletGenerateTestData) {
+                if (!wallet.generateTestData(walletFilesDirPath)) {
+                    throw RuntimeException()
+                }
+            }
+            val elapsedTime = System.currentTimeMillis() - startTime
+            // wallet created successfully
+            rootView.postDelayed(
+                { wr.get()?.startTariWalletViewAnimation() },
+                max(0L, (createWalletArtificalDelay - elapsedTime))
+            )
+        } catch (throwable: Throwable) {
+            // error
+            rootView.post {
+                wr.get()?.walletCreateError()
+            }
+            return
+        }
+    }
+
+    /**
+     * Wallet could not be created.
+     */
+    private fun walletCreateError() {
+        createWalletButton.visibility = View.VISIBLE
+        progressBar.visibility = View.GONE
     }
 
     private fun runStartupAnimation() {
@@ -172,7 +253,7 @@ class CreateWalletFragment : BaseFragment() {
             testnetTextView.alpha = alpha
             smallGemImageView.alpha = alpha
             walletBtnLayout.alpha = alpha
-            walletDesText.alpha = alpha
+            walletDescText.alpha = alpha
             titleTextLine1.alpha = alpha
             titleTextLine2.alpha = alpha
         }
@@ -243,5 +324,11 @@ class CreateWalletFragment : BaseFragment() {
         val animSet = AnimatorSet()
         animSet.playTogether(tariViewTranslateAnim, tariViewScaleAnim, fadeOutViewAnim)
         animSet.start()
+    }
+
+    interface Listener {
+
+        fun onCreateEmojiIdButtonClick()
+
     }
 }

@@ -49,6 +49,7 @@ internal object Constants {
         const val keyboardHideWaitMs = 100L
         const val shortAnimDurationMs = 300L
         const val mediumAnimDurationMs = 600L
+        const val longAnimDurationMs = 1000L
 
         const val scrollDepthShadowViewMaxOpacity = 0.8f
 
@@ -65,7 +66,10 @@ internal object Constants {
             const val startupAnimDurationMs = 1500L
             const val digitAnimDurationMs = 700L
             const val digitShrinkExpandAnimDurationMs = 200L
-
+            const val welcomeAnimationDurationMs = 800L
+            const val emptyWalletTxtFadeAnimDelayMs = 100L
+            const val showEmptyWalletFadeAnimDurationMs = 400L
+            const val showTariBotDialogDelayMs = 3000L
         }
 
         object CreateEmojiId {
@@ -79,6 +83,13 @@ internal object Constants {
             const val viewChangeAnimDelayMs = 3000L
             const val viewOverlapDelayMs = 150L
             const val createEmojiViewAnimDurationMs = 1200L
+            const val walletCreationFadeOutAnimDurationMs = 1000L
+            const val walletCreationFadeOutAnimDelayMs = 300L
+            const val continueButtonAnimDurationMs = 800L
+            const val emojiIdCreationViewAnimDurationMs = 1000L
+            const val emojiIdImageViewAnimDelayMs = 200L
+            const val yourEmojiIdTextAnimDelayMs = 300L
+            const val yourEmojiIdTextAnimDurationMs = 300L
         }
 
         object CreateWallet {
@@ -94,6 +105,18 @@ internal object Constants {
             const val numPadDigitEnterAnimDurationMs = 200L
         }
 
+        object AddNoteAndSend {
+            const val preKeyboardHideWaitMs = 500L
+            const val postSendDelayMs = 3000L
+
+        }
+
+        object SendTxSuccessful {
+            const val lottieAnimStartDelayMs = 400L
+            const val textAppearAnimStartDelayMs = 500L
+            const val textFadeOutAnimStartDelayMs = 4750L
+        }
+
         object Splash {
             const val createWalletStartUpDelayMs = 3000L
         }
@@ -103,12 +126,14 @@ internal object Constants {
      * Wallet constants.
      */
     object Wallet {
-        internal const val emojiIdLength = 12
+        internal const val emojiIdLength = 32
+        internal const val emojiIdShortenedLength = 12
         internal const val emojiFormatterChunkSize = 4
         const val WALLET_DB_NAME: String = "tari_wallet_db"
         internal val WALLET_CONTROL_SERVICE_ADDRESS: NetAddressString =
             NetAddressString("127.0.0.1", 80)
         internal val WALLET_LISTENER_ADDRESS: NetAddressString = NetAddressString("0.0.0.0", 0)
+        internal const val WALLET_SERVER_URL = "https://dropper.free.beeceptor.com"
     }
 
 }

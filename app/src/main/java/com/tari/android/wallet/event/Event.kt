@@ -15,7 +15,7 @@
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -31,24 +31,35 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package com.tari.android.wallet.event
-
 import com.tari.android.wallet.model.TxId
 
 /**
  * App-wide events.
  */
-internal interface Event {
+object Event {
 
     /**
      * Wallet events.
      */
-    interface Wallet {
+    object Wallet {
         data class TxBroadcast(val completedTxId: TxId)
         data class TxMined(val completedTxId: TxId)
         data class TxReceived(val pendingInboundTxId: TxId)
         data class TxReplyReceived(val completedTxId: TxId)
         data class TxFinalized(val completedTxId: TxId)
         data class DiscoveryComplete(val txId: TxId, val success: Boolean)
+    }
+
+    /**
+     * Tx events.
+     */
+    object Tx {
+        class TxSendSuccessful
+    }
+
+    object Testnet {
+        class TestnetTariRequestSuccessful
+        data class TestnetTariRequestError(val errorMessage: String)
     }
 
 }

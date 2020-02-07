@@ -38,6 +38,8 @@
     <!-- service -->
     <string name="service_title">Tari wallet service is running.</string>
     <string name="service_description">This service carries out wallet operations across applications.</string>
+    <string name="service_error_testnet_tari_request">Could not allocate free Tari.</string>
+    <string name="service_error_no_internet_connection">No internet connection!</string>
 
     <!-- auth -->
     <string name="testnet">TESTNET v1.0</string>
@@ -58,6 +60,17 @@
     <string name="home_send_tari">Send Tari</string>
     <string name="home_txs">Transactions</string>
     <string name="home_pending_txs">Pending Transactions</string>
+    <string name="home_hello">Hello!</string>
+    <string name="home_your_tari_wallet">This is your Tari Wallet</string>
+    <string name="home_empty_wallet">You don’t have any transactions yet</string>
+    <!--home tari bot dialog-->
+    <string name="home_tari_bot_you_got_tari_label_1">You got some</string>
+    <string name="home_tari_bot_you_got_tari_label_2">Tari!</string>
+    <string name="home_tari_bot_dialog_desc">TariBot has just sent you some Tari. To give the wallet a quick test, try sending TariBot back some Tari to see how it works.</string>
+    <string name="home_tari_bot_try_later">I’ll try it later</string>
+    <string name="home_swipe_down_to_show_wallet">Swipe down and I’ll  show you around your wallet</string>
+    <string name="home_tari_bot_some_tari_to_get_started">Some Tari to get you started.</string>
+
     <!-- test -->
     <string name="home_test_data_warning">Please wait.\n\nWallet is generating test data.</string>
     <!-- create emoji id-->
@@ -67,6 +80,10 @@
     <string name="create_emoji_id_wallet_address_desc">Your Emoji ID is your wallet address. \n It’s how your friends can find you and send you Tari.</string>
     <string name="create_emoji_id_now_text">Now create your Emoji ID</string>
     <string name="create_emoji_id_awesome">Awesome!</string>
+    <string name="create_emoji_id_your_emoji_id_text_label_1">This is your</string>
+    <string name="create_emoji_id_your_emoji_id_text_label_2"> Emoji ID</string>
+    <string name="create_emoji_id_set_of_emoji_your_wallet_address_desc">This set of emojis is your wallet address. \n It’s how your friends can find you and send you Tari.</string>
+    <string name="create_emoji_id_continue_and_create_emoji_id">Continue &amp; Create Emoji ID</string>
 
     <string name="scan_qr_description">Scan Tari QR code in the box below to send a Tari to recipient.</string>
     <string name="failed_init_camera_message">Failed to initialize Camera</string>
@@ -90,6 +107,16 @@
     <string name="add_amount_under_construction">Under Construction</string>
     <string name="add_amount_not_enough_available_balance">Not enough Tari in your available balance</string>
     <string name="add_amount_tx_fee">Transaction Fee</string>
+
+    <!-- send tari - note -->
+    <string name="add_note_and_send_prompt">What\'s it for?</string>
+    <string name="add_note_and_send_hint">You\’ll have to live with this note forever. No pressure.</string>
+    <string name="add_note_and_send_slide_to_send">Slide to Send</string>
+
+    <!-- send tari - successful -->
+    <!-- Tari amount should be formatted and passed as a string to this format -->
+    <string name="send_tx_sucessful_info_format">You just sent %1$s Tari</string>
+    <string name="send_tx_sucessful_info_format_bold_part">%1$s Tari</string>
 
     <!-- debug log - title -->
     <string name="debug_log_title">Log</string>
