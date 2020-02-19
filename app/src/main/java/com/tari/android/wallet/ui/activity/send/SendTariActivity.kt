@@ -32,13 +32,19 @@
  */
 package com.tari.android.wallet.ui.activity.send
 
+import android.app.Dialog
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.IBinder
+import android.view.Gravity
 import android.view.View
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import butterknife.BindColor
@@ -107,7 +113,7 @@ class SendTariActivity : BaseActivity(),
         // start service if not started yet
         if (walletService == null) {
             // bind to service
-            val bindIntent = Intent(this@SendTariActivity, WalletService::class.java)
+            val bindIntent = Intent(this, WalletService::class.java)
             bindService(bindIntent, this, Context.BIND_AUTO_CREATE)
         }
     }
@@ -115,15 +121,31 @@ class SendTariActivity : BaseActivity(),
     /**
      * Loads initial fragment.
      */
-    private fun loadAddRecipientFragment() {
-        val addRecipientFragment = AddRecipientFragment.newInstance(walletService!!)
-        val fragmentTx = mFragmentManager.beginTransaction()
-        fragmentTx.add(R.id.send_tari_vw_fragment_container, addRecipientFragment)
-        fragmentTx.commit()
-        currentFragmentWR = WeakReference(addRecipientFragment)
-        rootView.postDelayed({
-            wr.get()?.rootView?.setBackgroundColor(blackColor)
-        }, 1000)
+    private fun loadFragment() {
+        val recipientUser = intent.getParcelableExtra<User>("recipientUser")
+        if (recipientUser != null) {
+            val bundle = Bundle().apply {
+                putParcelable("recipientUser", recipientUser)
+            }
+            val addAmountFragment = AddAmountFragment.newInstance(walletService!!)
+            addAmountFragment.arguments = bundle
+            val fragmentTx = mFragmentManager.beginTransaction()
+            fragmentTx.add(R.id.send_tari_vw_fragment_container, addAmountFragment)
+            fragmentTx.commit()
+            currentFragmentWR = WeakReference(addAmountFragment)
+            rootView.postDelayed({
+                wr.get()?.rootView?.setBackgroundColor(blackColor)
+            }, 1000)
+        } else {
+            val addRecipientFragment = AddRecipientFragment.newInstance(walletService!!)
+            val fragmentTx = mFragmentManager.beginTransaction()
+            fragmentTx.add(R.id.send_tari_vw_fragment_container, addRecipientFragment)
+            fragmentTx.commit()
+            currentFragmentWR = WeakReference(addRecipientFragment)
+            rootView.postDelayed({
+                wr.get()?.rootView?.setBackgroundColor(blackColor)
+            }, 1000)
+        }
     }
 
     override fun onBackPressed() {
@@ -152,7 +174,7 @@ class SendTariActivity : BaseActivity(),
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         Logger.d("Connected to the wallet service.")
         walletService = TariWalletService.Stub.asInterface(service)
-        loadAddRecipientFragment()
+        loadFragment()
     }
 
     /**
@@ -196,6 +218,27 @@ class SendTariActivity : BaseActivity(),
             .addToBackStack(AddAmountFragment::class.java.simpleName)
             .commit()
         currentFragmentWR = WeakReference(fragment)
+    }
+
+    /**
+     * Display "hold your horses" dialog.
+     */
+    override fun onAmountExceedsActualAvailableBalance(fragment: AddAmountFragment) {
+        Dialog(this, R.style.Theme_AppCompat_Dialog).apply {
+            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            setContentView(R.layout.add_amount_dialog_actual_balance_exceeded)
+            setCancelable(true)
+            window?.setLayout(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            findViewById<TextView>(R.id.add_amount_dialog_btn_close)
+                .setOnClickListener {
+                    dismiss()
+                }
+            window?.setGravity(Gravity.BOTTOM)
+            show()
+        }
     }
 
     // endregion

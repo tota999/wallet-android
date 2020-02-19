@@ -61,9 +61,10 @@ class FFICommsConfigTests {
     fun testCommsConfig() {
         FFITestUtil.clearTestFiles(StringBuilder().append(datastorePath).toString())
         val privateKey = FFIPrivateKey(HexString(FFITestUtil.PRIVATE_KEY_HEX_STRING))
+        val transport = FFITransportType()
         val commsConfig = FFICommsConfig(
             controlServiceAddress,
-            listenerAddress,
+            transport,
             dbName,
             datastorePath,
             privateKey
@@ -73,13 +74,14 @@ class FFICommsConfigTests {
         privateKey.destroy()
     }
 
-    @Test(expected = FileSystemException::class)
+    @Test(expected = FFIException::class)
     fun testByteVectorException() {
         FFITestUtil.clearTestFiles(StringBuilder().append(datastorePath).toString())
         val privateKey = FFIPrivateKey(HexString(FFITestUtil.PRIVATE_KEY_HEX_STRING))
+        val transport = FFITransportType()
         val commsConfig = FFICommsConfig(
             controlServiceAddress,
-            listenerAddress,
+            transport,
             dbName,
             StringBuilder().append(datastorePath).append("bad_dir").toString(),
             privateKey

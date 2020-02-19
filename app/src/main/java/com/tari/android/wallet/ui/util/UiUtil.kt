@@ -35,6 +35,7 @@ package com.tari.android.wallet.ui.util
 import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Handler
 import android.view.View
@@ -44,6 +45,8 @@ import android.widget.ProgressBar
 import androidx.annotation.NonNull
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
+import com.google.zxing.BarcodeFormat
+import com.journeyapps.barcodescanner.BarcodeEncoder
 import java.lang.ref.WeakReference
 
 /**
@@ -161,6 +164,15 @@ internal object UiUtil {
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
+    fun showKeyboard(@NonNull activity: Activity) {
+        var view = activity.currentFocus
+        if (view == null) {
+            view = View(activity)
+        }
+        val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
+    }
+
     /**
      * Makes the view unclickable for a second, then makes it
      * clickable again.
@@ -204,5 +216,22 @@ internal object UiUtil {
         .authority(packageName)
         .path(resourceId.toString())
         .build()
+
+    /**
+     * @param content content to encode
+     * @param size bitmap size
+     * @return the encoded bitmap
+     **/
+    fun getQREncodedBitmap(content: String, size: Int): Bitmap? {
+        try {
+            val barcodeEncoder = BarcodeEncoder()
+            return barcodeEncoder.encodeBitmap(
+                content,
+                BarcodeFormat.QR_CODE, size, size
+            )
+        } catch (e: Exception) {
+        }
+        return null
+    }
 
 }

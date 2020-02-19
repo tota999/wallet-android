@@ -21,6 +21,8 @@
 
     <!-- common -->
     <string name="common_continue">Continue</string>
+    <string name="common_from">From</string>
+    <string name="common_close">Close</string>
 
     <!-- dummy values - UI design placeholders -->
     <string name="dummy_positive_tx_value">+ 152.75</string>
@@ -71,29 +73,27 @@
     <string name="home_swipe_down_to_show_wallet">Swipe down and I’ll  show you around your wallet</string>
     <string name="home_tari_bot_some_tari_to_get_started">Some Tari to get you started.</string>
 
-    <!-- test -->
-    <string name="home_test_data_warning">Please wait.\n\nWallet is generating test data.</string>
-    <!-- create emoji id-->
-    <string name="create_emoji_id_hello_friend_label">Hello Friend</string>
-    <string name="create_emoji_id_just_a_sec_label">Just a sec...</string>
-    <string name="create_emoji_id_just_sec_desc_text">Your wallet is being created</string>
-    <string name="create_emoji_id_wallet_address_desc">Your Emoji ID is your wallet address. \n It’s how your friends can find you and send you Tari.</string>
-    <string name="create_emoji_id_now_text">Now create your Emoji ID</string>
-    <string name="create_emoji_id_awesome">Awesome!</string>
-    <string name="create_emoji_id_your_emoji_id_text_label_1">This is your</string>
-    <string name="create_emoji_id_your_emoji_id_text_label_2"> Emoji ID</string>
-    <string name="create_emoji_id_set_of_emoji_your_wallet_address_desc">This set of emojis is your wallet address. \n It’s how your friends can find you and send you Tari.</string>
-    <string name="create_emoji_id_continue_and_create_emoji_id">Continue &amp; Create Emoji ID</string>
+    <!-- introduction -->
+    <string name="introduction_crypto_wallet_title_text_line_1">A crypto wallet</string>
+    <string name="introduction_crypto_wallet_title_text_line_2">that’s easy to use.</string>
+    <string name="introduction_wallet_desc">Tari wallet puts you and your privacy at the core of everything and is still easy to use.</string>
+    <string name="introduction_create_wallet">Create a Wallet</string>
+
+    <!-- create wallet -->
+    <string name="create_wallet_hello_friend_label">Hello Friend</string>
+    <string name="create_wallet_just_a_sec_label">Just a sec...</string>
+    <string name="create_wallet_just_sec_desc_text">Your wallet is being created</string>
+    <string name="create_wallet_address_desc">Your Emoji ID is your wallet address. \n It’s how your friends can find you and send you Tari.</string>
+    <string name="create_wallet_now_text">Now create your Emoji ID</string>
+    <string name="create_wallet_awesome">Awesome!</string>
+    <string name="create_wallet_your_emoji_id_text_label_1">This is your</string>
+    <string name="create_wallet_your_emoji_id_text_label_2"> Emoji ID</string>
+    <string name="create_wallet_set_of_emoji_your_wallet_address_desc">This set of emojis is your wallet address. \n It’s how your friends can find you and send you Tari.</string>
+    <string name="create_wallet_continue_and_create_emoji_id">Continue &amp; Create Emoji ID</string>
 
     <string name="scan_qr_description">Scan Tari QR code in the box below to send a Tari to recipient.</string>
     <string name="failed_init_camera_message">Failed to initialize Camera</string>
     <string name="camera_permission_denied_message">Camera permission denied</string>
-
-    <!-- create wallet -->
-    <string name="crypto_wallet_title_text_line_1">A crypto wallet</string>
-    <string name="crypto_wallet_title_text_line_2">that’s easy to use.</string>
-    <string name="crypto_wallet_desc">Tari wallet puts you and your privacy at the core of everything and is still easy to use.</string>
-    <string name="create_wallet">Create a Wallet</string>
 
     <!-- send tari - add recipient -->
     <string name="add_recipient_title">Send To</string>
@@ -107,6 +107,8 @@
     <string name="add_amount_under_construction">Under Construction</string>
     <string name="add_amount_not_enough_available_balance">Not enough Tari in your available balance</string>
     <string name="add_amount_tx_fee">Transaction Fee</string>
+    <string name="add_amount_balance_exceeded_dialog_title">Hold your horses! 🐴</string>
+    <string name="add_amount_balance_exceeded_dialog_description">Sorry, you can\’t send this much Tari at once. Please wait for your other transaction to be completed and then try again.</string>
 
     <!-- send tari - note -->
     <string name="add_note_and_send_prompt">What\'s it for?</string>
@@ -120,5 +122,25 @@
 
     <!-- debug log - title -->
     <string name="debug_log_title">Log</string>
+    <!-- wallet info -->
+    <string name="wallet_info_title_label_1">Share your</string>
+    <string name="wallet_info_title_label_2">Emoji ID</string>
+    <string name="wallet_info_title_label_3">to receive Tari</string>
+    <string name="wallet_info_copy_emoji_id">Copy my emoji ID</string>
+    <string name="wallet_info_qr_code_desc">Transacting in person? Your sender can get your \n emoji ID by scanning this QR code in their Tari app</string>
+    <string name="wallet_info_emoji_id_copied">Your emoji ID is copied.</string>
+
+    <!--    Transaction Details-->
+    <string name="tx_detail_payment_received">Payment Received</string>
+    <string name="tx_detail_payment_sent">Payment Sent</string>
+    <string name="tx_detail_pending_payment_sent">Pending Payment Sent</string>
+    <string name="tx_detail_pending_payment_received">Pending Payment Received</string>
+    <string name="tx_detail_contact_name">Contact Name</string>
+    <string name="tx_detail_create_contact_hint">Create a Contact Name</string>
+    <string name="tx_detail_note">Note</string>
+    <string name="tx_detail_edit">Edit</string>
+    <string name="tx_detail_add_contact">Add Contact Name</string>
+    <string name="tx_detail_transaction_fee">Transaction Fee</string>
+    <string name="tx_detail_transaction_id">Transaction ID</string>
 
 </resources>

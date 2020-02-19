@@ -35,9 +35,9 @@ package com.tari.android.wallet.di
 import android.content.Context
 import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.SharedPrefsWrapper
 import dagger.Module
 import dagger.Provides
-import java.lang.RuntimeException
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -52,21 +52,38 @@ class WalletModule {
     object FieldName {
         const val walletFilesDirPath = "wallet_files_dir_path"
         const val walletLogFilePath = "wallet_log_file_path"
-        const val emojiId = "wallet_emoji_id"
     }
 
     private val logFileName = "tari_wallet.log"
-    private val privateKeyHexString: String =
-        "6259C39F75E27140A652A5EE8AEFB3CF6C1686EF21D27793338D899380E8C801"
 
+    /**
+     * The directory in which the wallet files reside.
+     */
     @Provides
     @Named(FieldName.walletFilesDirPath)
     internal fun provideWalletFilesDirPath(context: Context): String = context.filesDir.absolutePath
 
+    /**
+     * FFI log file path.
+     */
     @Provides
     @Named(FieldName.walletLogFilePath)
     internal fun provideWalletLogFilePath(@Named(FieldName.walletFilesDirPath) walletFilesDirPath: String): String {
         return "$walletFilesDirPath/$logFileName"
+    }
+
+    /**
+     * Creates a new private key & stores if it doesn't exist.
+     */
+    private fun getPrivateKeyHexString(sharedPrefsWrapper: SharedPrefsWrapper): HexString {
+        var hexString = sharedPrefsWrapper.privateKeyHexString
+        if (hexString == null) {
+            val privateKeyFFI = FFIPrivateKey()
+            hexString = privateKeyFFI.toString()
+            privateKeyFFI.destroy()
+            sharedPrefsWrapper.privateKeyHexString = hexString
+        }
+        return HexString(hexString)
     }
 
     /**
@@ -75,14 +92,17 @@ class WalletModule {
     @Provides
     @Singleton
     internal fun provideCommsConfig(
+        sharedPrefsWrapper: SharedPrefsWrapper,
         @Named(FieldName.walletFilesDirPath) walletFilesDirPath: String
     ): FFICommsConfig {
+        //TODO: Change to tor
+        val transport = FFITransportType()
         return FFICommsConfig(
-            Constants.Wallet.WALLET_CONTROL_SERVICE_ADDRESS,
             Constants.Wallet.WALLET_LISTENER_ADDRESS,
+            transport,
             Constants.Wallet.WALLET_DB_NAME,
             walletFilesDirPath,
-            FFIPrivateKey(HexString(privateKeyHexString))
+            FFIPrivateKey((getPrivateKeyHexString(sharedPrefsWrapper)))
         )
     }
 
@@ -93,23 +113,20 @@ class WalletModule {
     @Singleton
     internal fun provideTestWallet(
         commsConfig: FFICommsConfig,
-        @Named(FieldName.walletLogFilePath) logFilePath: String
+        @Named(FieldName.walletLogFilePath) logFilePath: String,
+        sharedPrefsWrapper: SharedPrefsWrapper
     ): FFITestWallet {
         if (FFITestWallet.instance == null) {
-            FFITestWallet.instance = FFITestWallet(commsConfig, logFilePath)
+            val wallet = FFITestWallet(commsConfig, logFilePath)
+            FFITestWallet.instance = wallet
+            // set shared preferences values after instantiation
+            val publicKeyFFI = wallet.getPublicKey()
+            sharedPrefsWrapper.publicKeyHexString = publicKeyFFI.toString()
+            sharedPrefsWrapper.emojiId = publicKeyFFI.getEmojiNodeId()
+            publicKeyFFI.destroy()
+
         }
         return FFITestWallet.instance!!
-    }
-
-    /**
-     * Provides the emoji id of the wallet.
-     */
-    @Provides
-    @Named(FieldName.emojiId)
-    internal fun provideWalletEmojiId(): String {
-        val wallet = FFITestWallet.instance
-            ?: throw RuntimeException("Wallet has not been initialized yet.")
-        return wallet.getPublicKey().getEmoji()
     }
 
 }

@@ -30,13 +30,49 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.util
+package com.tari.android.wallet.model
 
 /**
- * Maps float from one range to another.
+ * Enumerates FFI error codes.
  *
- * @return mapped float
+ * @author The Tari Development Team
  */
-fun Float.remap(from1: Float, to1: Float, from2: Float, to2: Float): Float {
-    return (this - from1) / (to1 - from1) * (to2 - from2) + from2
+enum class WalletErrorCode(val code: Int) {
+
+    NO_ERROR(0),
+    /**
+     * For any error with an unknown error code, or a different class than FFIError.
+     */
+    UNKNOWN_ERROR(1000000),
+
+    // TODO The rest will be completed once the error codes get updated in the Rust codebase.
+    // https://github.com/tari-project/tari/blob/development/base_layer/wallet_ffi/src/error.rs
+    NULL_ERROR(1),
+    ALLOCATION_ERROR(2),
+    POSITION_INVALID_ERROR(3),
+    TOKIO_ERROR(3),
+
+    NOT_ENOUGH_FUNDS(101),
+    INCOMPLETE_TX(102),
+    DUPLICATE_OUTPUT(103),
+    VALUES_NOT_FOUND(104),
+    OUTPUT_ALREADY_SPENT(105),
+    PENDING_TX_NOT_FOUND(106),
+
+    OUTBOUND_SEND_DISCOVERY_IN_PROGRESS(210);
+
+    companion object {
+
+        fun fromCode(code: Int): WalletErrorCode {
+            for (value in values()) {
+                if (value.code == code) {
+                    return value
+                }
+            }
+            return UNKNOWN_ERROR
+        }
+
+    }
+
+
 }

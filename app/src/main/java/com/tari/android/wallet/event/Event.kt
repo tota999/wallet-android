@@ -31,6 +31,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package com.tari.android.wallet.event
+
+import com.tari.android.wallet.model.PublicKey
 import com.tari.android.wallet.model.TxId
 
 /**
@@ -51,14 +53,21 @@ object Event {
     }
 
     /**
-     * Tx events.
+     * Contact events.
+     */
+    object Contact {
+        data class ContactAddedOrUpdated(val contactPublicKey: PublicKey, val contactAlias: String)
+    }
+
+    /**
+     * Transaction events.
      */
     object Tx {
         class TxSendSuccessful
     }
 
     object Testnet {
-        class TestnetTariRequestSuccessful
+        class TestnetTariRequestSuccessful(val senderPublicKey: PublicKey)
         data class TestnetTariRequestError(val errorMessage: String)
     }
 

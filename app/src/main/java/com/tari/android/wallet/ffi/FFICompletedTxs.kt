@@ -67,18 +67,14 @@ internal class FFICompletedTxs constructor(pointer: FFICompletedTxsPtr): FFIBase
     fun getLength(): Int {
         val error = FFIError()
         val result = jniGetLength(ptr, error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
     fun getAt(index: Int): FFICompletedTx {
         val error = FFIError()
         val result = FFICompletedTx(jniGetAt(ptr, index, error))
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 

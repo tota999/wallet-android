@@ -32,9 +32,9 @@
  */
 package com.tari.android.wallet.ui.fragment.send
 
-import android.content.ClipboardManager
+import android.app.Activity
 import android.content.Context
-import android.content.Context.CLIPBOARD_SERVICE
+import android.content.Intent
 import android.os.AsyncTask
 import android.os.Bundle
 import android.text.Editable
@@ -50,21 +50,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.*
 import com.tari.android.wallet.R
-import com.tari.android.wallet.model.Contact
-import com.tari.android.wallet.model.PublicKey
-import com.tari.android.wallet.model.Tx
-import com.tari.android.wallet.model.User
+import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.ui.activity.EXTRA_QR_DATA
+import com.tari.android.wallet.ui.activity.QRScannerActivity
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.fragment.send.adapter.RecipientListAdapter
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.*
-import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.Wallet.emojiFormatterChunkSize
 import com.tari.android.wallet.util.Constants.Wallet.emojiIdLength
-import com.tari.android.wallet.util.EmojiUtil
-import com.tari.android.wallet.util.numberOfEmojis
-import com.tari.android.wallet.util.firstNCharactersAreEmojis
 import java.lang.ref.WeakReference
 import kotlin.math.min
 
@@ -73,6 +68,7 @@ import kotlin.math.min
  *
  * @author The Tari Development Team
  */
+
 class AddRecipientFragment(private val walletService: TariWalletService) : BaseFragment(),
     RecipientListAdapter.Listener,
     RecyclerView.OnItemTouchListener,
@@ -194,7 +190,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
     override fun onStart() {
         super.onStart()
         AsyncTask.execute {
-            wr.get()?.checkClipboardForValidEmojiId()
+            //wr.get()?.checkClipboardForValidEmojiId()
         }
     }
 
@@ -203,10 +199,17 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
         listenerWR = WeakReference(context as Listener)
     }
 
+    private fun startQRCodeActivity() {
+        val intent = Intent(activity, QRScannerActivity::class.java)
+        startActivityForResult(intent, QRScannerActivity.REQUEST_QR_SCANNER)
+        activity?.overridePendingTransition(R.anim.slide_up, 0)
+    }
+
     /**
      * Checks whether an emoji id is in the clipboard data.
      * Currently checks for a single emoji.
      */
+    /*
     private fun checkClipboardForValidEmojiId(): Boolean {
         val clipboardManager =
             (activity?.getSystemService(CLIPBOARD_SERVICE) as? ClipboardManager) ?: return false
@@ -214,7 +217,12 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
             clipboardManager.primaryClip?.getItemAt(0)?.text?.toString() ?: return false
         // if clipboard contains at least 1 emoji, then display paste emoji banner
         if (clipboardString.numberOfEmojis() > 0) {
-            emojiIdPublicKey = walletService.getPublicKeyForEmojiId(clipboardString)
+            val error = WalletError()
+            emojiIdPublicKey = walletService.getPublicKeyForEmojiId(clipboardString, error)
+            if (error.code != WalletErrorCode.NO_ERROR) {
+                // TODO handle error
+                return false
+            }
             if (emojiIdPublicKey != null) {
                 recyclerView.post {
                     wr.get()?.displayPasteEmojiIdViews()
@@ -230,6 +238,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
             return false
         }
     }
+    */
 
     /**
      * Hides paste-emoji-id-related views.
@@ -244,6 +253,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
     /**
      * Displays paste-emoji-id-related views.
      */
+    /*
     private fun displayPasteEmojiIdViews() {
         // TODO this will change once emoji id display spec is clear
         val shortenedEmojiId = EmojiUtil.getShortenedEmojiId(emojiIdPublicKey!!.emojiId)
@@ -253,13 +263,18 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
             it.visibility = View.VISIBLE
         }
     }
+    */
 
     /**
      * Fetches users with whom this wallet had recent transactions.
      */
     private fun fetchRecentTxUsers() {
-        val users = walletService.getRecentTxUsers(recentTxContactsLimit)
-        val contacts = walletService.contacts
+        val error = WalletError()
+        val users = walletService.getRecentTxUsers(recentTxContactsLimit, error)
+        val contacts = walletService.getContacts(error)
+        if (error.code != WalletErrorCode.NO_ERROR) {
+            TODO("Unhandled wallet error: ${error.code}")
+        }
         recyclerView.post {
             wr.get()?.displayList(users, contacts)
         }
@@ -318,16 +333,26 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
      * Makes a search by the input.
      */
     private fun searchRecipients(query: String) {
+        val error = WalletError()
+        val contacts = walletService.getContacts(error)
+        val completedTxs = walletService.getCompletedTxs(error)
+        val pendingInboundTxs = walletService.getPendingInboundTxs(error)
+        val pendingOutboundTxs = walletService.getPendingOutboundTxs(error)
+        if (error.code != WalletErrorCode.NO_ERROR) {
+            TODO("Unhandled wallet error: ${error.code}")
+        }
+
+
         val users = ArrayList<User>()
         // get all contacts and filter by alias and emoji id
-        val filteredContacts = walletService.contacts.filter {
+        val filteredContacts = contacts.filter {
             it.alias.contains(query, ignoreCase = true) || it.publicKey.emojiId.contains(query)
         }
         users.addAll(filteredContacts)
         val allTxs = ArrayList<Tx>()
-        allTxs.addAll(walletService.completedTxs)
-        allTxs.addAll(walletService.pendingInboundTxs)
-        allTxs.addAll(walletService.pendingOutboundTxs)
+        allTxs.addAll(completedTxs)
+        allTxs.addAll(pendingInboundTxs)
+        allTxs.addAll(pendingOutboundTxs)
         for (tx in allTxs) {
             if (tx.user.publicKey.emojiId.contains(query)) {
                 if (!users.contains(tx.user)) {
@@ -354,6 +379,33 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
         listenerWR.get()?.continueToAmount(this, recipient)
     }
 
+    /**
+     * Open QR code scanner on button click.
+     */
+    @OnClick(R.id.add_recipient_btn_qr_code)
+    fun onQRButtonClick() {
+        val mActivity = activity ?: return
+        UiUtil.hideKeyboard(mActivity)
+        rootView.postDelayed({
+            wr.get()?.startQRCodeActivity()
+        }, Constants.UI.keyboardHideWaitMs)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == QRScannerActivity.REQUEST_QR_SCANNER
+            && resultCode == Activity.RESULT_OK
+            && data != null
+        ) {
+            data.getStringExtra(EXTRA_QR_DATA)?.let {
+                val qrData = WalletUtil.getQrScanData(it)
+                searchEditText.setText(
+                    qrData.emojiId,
+                    TextView.BufferType.EDITABLE
+                )
+            }
+        }
+    }
+
     @OnClick(R.id.add_recipient_btn_continue)
     fun onContinueButtonClicked(view: View) {
         UiUtil.temporarilyDisableClick(view)
@@ -371,8 +423,9 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
         R.id.add_recipinet_vw_middle_dimmer,
         R.id.add_recipinet_vw_bottom_dimmer
     )
+
     fun onEmojiIdDimmerClicked() {
-        hidePasteEmojiIdViews()
+        //hidePasteEmojiIdViews()
         val mActivity = activity ?: return
         UiUtil.hideKeyboard(mActivity)
         searchEditText.clearFocus()

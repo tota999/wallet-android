@@ -201,6 +201,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         jstring callback_discovery_process_complete,
         jstring callback_discovery_process_complete_sig,
         jobject error) {
+
     int i = 0;
     int *r = &i;
     if (callbackHandler == nullptr) {
@@ -278,9 +279,11 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
     TariWalletConfig *pWalletConfig = reinterpret_cast<TariWalletConfig *>(jpWalletConfig);
 
     char *pLogPath = const_cast<char *>(jEnv->GetStringUTFChars(jLogPath, JNI_FALSE));
+
     TariWallet *pWallet = wallet_create(pWalletConfig, pLogPath, ReceivedCallback, ReplyCallback,
                                         FinalizedCallback, BroadcastCallback, MinedCallback,
                                         DiscoveryCallback, r);
+
     setErrorCode(jEnv, error, i);
     jEnv->ReleaseStringUTFChars(jLogPath, pLogPath);
     return reinterpret_cast<jlong>(pWallet);
@@ -739,7 +742,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniImportUTXO(
     const char* pMessage = jEnv->GetStringUTFChars(jMessage, JNI_FALSE);
     unsigned long long amount = strtoull(nativeAmount, &pAmountEnd,10);
     jbyteArray result = getBytesFromUnsignedLongLong(jEnv,
-    wallet_import_utxo(pWallet, amount, pSpendingKey, pSourcePublicKey, pMessage, r)
+                                                     wallet_import_utxo(pWallet, amount, pSpendingKey, pSourcePublicKey, pMessage, r)
     );
     setErrorCode(jEnv, error, i);
     jEnv->ReleaseStringUTFChars(jAmount,nativeAmount);
@@ -747,5 +750,54 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniImportUTXO(
     return result;
 }
 
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniAddBaseNodePeer(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jlong jpPublicKey,
+        jstring jAddress,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
+    TariPublicKey *pPublicKey = reinterpret_cast<TariPublicKey *>(jpPublicKey);
+    char *pAddress = const_cast<char *>(jEnv->GetStringUTFChars(jAddress, JNI_FALSE));
+    jboolean result = wallet_add_base_node_peer(pWallet,pPublicKey,pAddress,r) != 0;
+    jEnv->ReleaseStringUTFChars(jAddress, pAddress);
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniSyncBaseNode(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
+    jboolean result = wallet_sync_with_base_node(pWallet,r) != 0;
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniGetTorPrivateKey(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
+    ByteVector *pTorPrivateKey = wallet_get_tor_identity(pWallet,r);
+    setErrorCode(jEnv, error, i);
+    return reinterpret_cast<jlong>(pTorPrivateKey);
+}
 
 //endregion

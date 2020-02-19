@@ -11,8 +11,8 @@ android {
         applicationId "com.tari.android.wallet"
         minSdkVersion 24
         targetSdkVersion 29
-        versionCode 6
-        versionName "0.0.6"
+        versionCode 7
+        versionName "0.0.7"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
@@ -65,7 +65,7 @@ dependencies {
     // android
     implementation 'androidx.appcompat:appcompat:1.1.0'
     // kotlin extensions
-    implementation 'androidx.core:core-ktx:1.2.0-rc01'
+    implementation 'androidx.core:core-ktx:1.3.0-alpha01'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     // android jetpack
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
@@ -80,9 +80,6 @@ dependencies {
 
     // support lib
     implementation 'androidx.legacy:legacy-support-v13:1.0.0'
-
-    // firebase
-    implementation 'com.google.firebase:firebase-messaging:20.1.0'
 
     // test
     testImplementation 'junit:junit:4.12'
@@ -120,9 +117,13 @@ dependencies {
     kapt "com.jakewharton:butterknife-compiler:10.2.0"
     // logger
     implementation 'com.orhanobut:logger:2.2.0'
-    //QR scanner
+    // QR scanner
     implementation 'com.budiyev.android:code-scanner:2.1.0'
-    //retrofit
+    // retrofit
     implementation "com.squareup.retrofit2:retrofit:2.6.2"
     implementation "com.squareup.retrofit2:converter-gson:2.6.2"
+    implementation 'com.journeyapps:zxing-android-embedded:4.1.0'
+
+    // encryption
+    implementation "de.adorsys.android:securestoragelibrary:1.0.0"
 }
