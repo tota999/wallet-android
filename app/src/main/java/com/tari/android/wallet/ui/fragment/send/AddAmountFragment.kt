@@ -59,9 +59,12 @@ import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.WalletUtil
 import com.tari.android.wallet.extension.remap
+import org.matomo.sdk.Tracker
+import org.matomo.sdk.extra.TrackHelper
 import java.lang.StringBuilder
 import java.lang.ref.WeakReference
 import java.math.BigInteger
+import javax.inject.Inject
 import kotlin.math.min
 
 /**
@@ -143,6 +146,9 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
      */
     @BindString(R.string.emoji_id_chunk_separator_char)
     lateinit var emojiIdChunkSeparator: String
+
+    @Inject
+    lateinit var tracker: Tracker
 
     /**
      * Maps all the elements (digits & separators) displayed in the amount text to their
@@ -244,6 +250,11 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
                     )
                 }
             })
+
+        TrackHelper.track()
+            .screen("/home/send_tari/add_amount")
+            .title("Send Tari - Add Amount")
+            .with(tracker)
     }
 
     override fun onAttach(context: Context) {
@@ -792,7 +803,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
                 digitAnimIsRunning = false
             }
         }
-        viewAnim.duration = Constants.UI.shortAnimDurationMs
+        viewAnim.duration = Constants.UI.shortDurationMs
         // define interpolator
         viewAnim.interpolator = EasingInterpolator(Ease.CIRC_OUT)
         viewAnim.start()
@@ -850,7 +861,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
         continueButton.alpha = 0f
         continueButton.visibility = View.VISIBLE
         val anim = ObjectAnimator.ofFloat(continueButton, "alpha", 0f, 1f)
-        anim.duration = Constants.UI.shortAnimDurationMs
+        anim.duration = Constants.UI.shortDurationMs
         anim.start()
     }
 
@@ -885,7 +896,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
                         wr.get()?.txFeeContainerView?.translationY = (1f - value) * 100
                         wr.get()?.txFeeContainerView?.alpha = value
                     }
-                    viewAnim.duration = Constants.UI.shortAnimDurationMs
+                    viewAnim.duration = Constants.UI.shortDurationMs
                     // define interpolator
                     viewAnim.interpolator = EasingInterpolator(Ease.CIRC_OUT)
                     viewAnim.start()
@@ -936,7 +947,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
                         wr.get()?.txFeeContainerView?.visibility = View.INVISIBLE
                     }
                 }
-                viewAnim.duration = Constants.UI.shortAnimDurationMs
+                viewAnim.duration = Constants.UI.shortDurationMs
                 // define interpolator
                 viewAnim.interpolator = EasingInterpolator(Ease.CIRC_OUT)
                 viewAnim.start()

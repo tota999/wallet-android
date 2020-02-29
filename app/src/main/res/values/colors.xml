@@ -57,4 +57,14 @@
     <!-- Wallet info -->
     <color name="wallet_info_qr_code_desc">#7f8599</color>
     <color name="wallet_info_emoji_id_summary_divider">#979797</color>
+
+    <!-- transaction detail -->
+    <color name="tx_detail_contact_name_label_text">#B2B2B2</color>
+    <color name="tx_detail_contact_view_divider">#f1f1f1</color>
+    <color name="tx_detail_header_shadow_gradient_start">#80B2B2B2</color>
+
+    <!-- local auth -->
+    <color name="auth_touch_id_prompt_anim_bg">#979797</color>
+    <color name="auth_touch_id_prompt_black_bg">#E6000000</color>
+
 </resources>

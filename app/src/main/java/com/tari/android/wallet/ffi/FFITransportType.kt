@@ -40,23 +40,30 @@ internal typealias FFITransportTypePtr = Long
  *
  * @author The Tari Development Team
  */
-internal class FFITransportType constructor(pointer: FFITransportTypePtr): FFIBase() {
+internal class FFITransportType constructor(pointer: FFITransportTypePtr) : FFIBase() {
 
     // region JNI
     private external fun jniMemoryTransport(): FFITransportTypePtr
-    private external fun jniGetMemoryAddress(pointer: FFITransportTypePtr,libError: FFIError): String
+
+    private external fun jniGetMemoryAddress(
+        pointer: FFITransportTypePtr,
+        libError: FFIError
+    ): String
+
     private external fun jniTCPTransport(
         listenerAddress: String, libError: FFIError
     ): FFITransportTypePtr
+
     private external fun jniTorTransport(
         control_server_address: String,
         tor_port: Int,
-        tor_password: String,
-        tor_private_key: FFIByteVectorPtr,
+        tor_cookie: FFIByteVectorPtr,
+        tor_identity: FFIByteVectorPtr,
         socks_username: String,
         socks_password: String,
         libError: FFIError
     ): FFITransportTypePtr
+
     private external fun jniDestroy(pointer: FFITransportTypePtr)
     // endregion
 
@@ -70,33 +77,39 @@ internal class FFITransportType constructor(pointer: FFITransportTypePtr): FFIBa
         ptr = jniMemoryTransport()
     }
 
-    constructor(listenerAddress: String) : this(nullptr) {
+    constructor(listenerAddress: NetAddressString) : this(nullptr) {
         val error = FFIError()
-        ptr = jniTCPTransport(listenerAddress,error)
+        ptr = jniTCPTransport(listenerAddress.toString(), error)
         throwIf(error)
     }
 
     constructor(
-        controlAddress: String,
+        controlAddress: NetAddressString,
         torPort: Int,
-        torPassword: String,
-        torKey: FFIByteVector,
+        torCookie: FFIByteVector,
+        torIdentity: FFIByteVector,
         socksUsername: String,
         socksPassword: String
     ) : this(nullptr) {
         val error = FFIError()
-        ptr = jniTorTransport(controlAddress,torPort,torPassword,torKey.getPointer(),socksUsername,socksPassword,error)
+        ptr = jniTorTransport(
+            controlAddress.toString(),
+            torPort,
+            torCookie.getPointer(),
+            torIdentity.getPointer(),
+            socksUsername,
+            socksPassword,
+            error
+        )
         throwIf(error)
     }
-
     fun getPointer(): FFIPrivateKeyPtr {
         return ptr
     }
 
-    fun getAddress(): String
-    {
+    fun getAddress(): String {
         val error = FFIError()
-        val result = jniGetMemoryAddress(ptr,error)
+        val result = jniGetMemoryAddress(ptr, error)
         throwIf(error)
         return result
     }

@@ -175,19 +175,19 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
     private external fun jniAddBaseNodePeer(
         walletPtr: FFIWalletPtr,
         publicKeyPtr: FFIPublicKeyPtr,
-        address:String,
+        address: String,
         libError: FFIError
-    ) : Boolean
+    ): Boolean
 
     private external fun jniSyncBaseNode(
         walletPtr: FFIWalletPtr,
         libError: FFIError
-    ) : Boolean
+    ): Boolean
 
-    private external fun  jniGetTorPrivateKey(
+    private external fun jniGetTorPrivateKey(
         walletPtr: FFIWalletPtr,
         libError: FFIError
-    ) : FFIByteVectorPtr
+    ): FFIByteVectorPtr
 
     private external fun jniDestroy(walletPtr: FFIWalletPtr)
 
@@ -201,7 +201,7 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
     init {
         if (ptr == nullptr) { // so it can only be assigned once for the singleton
             val error = FFIError()
-            Logger.e("Pre jniCreate.")
+            Logger.i("Pre jniCreate.")
             ptr = jniCreate(
                 commsConfig.getPointer(), logPath,
                 this::onTxReceived.name, "(J)V",
@@ -212,7 +212,7 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
                 this::onDiscoveryComplete.name, "([BZ)V",
                 error
             )
-            Logger.e("Post jniCreate.")
+            Logger.i("Post jniCreate.")
             Log.i("Wallet Code", error.code.toString())
             throwIf(error)
         }
@@ -434,29 +434,28 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         return BigInteger(1, bytes)
     }
 
-    fun syncBaseNode() : Boolean
-    {
+    fun syncBaseNode(): Boolean {
         val error = FFIError()
-        val result = jniSyncBaseNode(ptr,error)
+        val result = jniSyncBaseNode(ptr, error)
         throwIf(error)
         return result
     }
 
-    fun getTorPrivateKey() : String
-    {
+    fun getTorPrivateKey(): String {
         val error = FFIError()
-        val resultPtr = jniGetTorPrivateKey(ptr,error)
+        val resultPtr = jniGetTorPrivateKey(ptr, error)
         throwIf(error)
         val bytes = FFIByteVector(resultPtr)
         throwIf(error)
         return bytes.toString()
     }
 
-    fun addBaseNodePeer(baseNodePublicKey: FFIPublicKey,
-                        baseNodeAddress: String) : Boolean
-    {
+    fun addBaseNodePeer(
+        baseNodePublicKey: FFIPublicKey,
+        baseNodeAddress: String
+    ): Boolean {
         val error = FFIError()
-        val result = jniAddBaseNodePeer(ptr,baseNodePublicKey.getPointer(),baseNodeAddress,error)
+        val result = jniAddBaseNodePeer(ptr, baseNodePublicKey.getPointer(), baseNodeAddress, error)
         throwIf(error)
         return result
     }

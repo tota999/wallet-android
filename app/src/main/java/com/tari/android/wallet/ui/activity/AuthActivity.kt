@@ -15,7 +15,7 @@
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -51,8 +51,11 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.auth.AuthUtil
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.util.Constants
+import org.matomo.sdk.Tracker
+import org.matomo.sdk.extra.TrackHelper
 import java.lang.ref.WeakReference
 import java.util.concurrent.Executors
+import javax.inject.Inject
 
 /**
  * Initial activity class - authenticates the user.
@@ -71,6 +74,9 @@ class AuthActivity : BaseActivity(), Animator.AnimatorListener {
     @BindView(R.id.main_img_small_gem)
     lateinit var smallGemImageView: ImageView
 
+    @Inject
+    lateinit var tracker: Tracker
+
     override val contentViewId = R.layout.activity_auth
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,6 +86,15 @@ class AuthActivity : BaseActivity(), Animator.AnimatorListener {
         // call the animations
         val wr = WeakReference<AuthActivity>(this)
         bigGemImageView.post { wr.get()?.showTariText() }
+
+        TrackHelper.track()
+            .screen("/local_auth")
+            .title("Local Authentication")
+            .with(tracker)
+    }
+
+    override fun onBackPressed() {
+        // no-op
     }
 
     /**
@@ -108,9 +123,9 @@ class AuthActivity : BaseActivity(), Animator.AnimatorListener {
 
         // chain animations
         val animSet = AnimatorSet()
-        animSet.startDelay = Constants.UI.shortAnimDurationMs
+        animSet.startDelay = Constants.UI.shortDurationMs
         animSet.play(showTariTextAnim).after(hideGemAnim)
-        animSet.duration = Constants.UI.shortAnimDurationMs
+        animSet.duration = Constants.UI.shortDurationMs
         // define interpolator
         animSet.interpolator = EasingInterpolator(Ease.QUART_IN)
 

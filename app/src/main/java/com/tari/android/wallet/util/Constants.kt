@@ -47,9 +47,11 @@ internal object Constants {
     object UI {
 
         const val keyboardHideWaitMs = 100L
-        const val shortAnimDurationMs = 300L
-        const val mediumAnimDurationMs = 600L
-        const val longAnimDurationMs = 1000L
+        const val shortDurationMs = 300L
+        const val mediumDurationMs = 600L
+        const val longDurationMs = 1000L
+        const val xLongDurationMs = 1500L
+        const val xxLongDurationMs = 2000L
 
         const val scrollDepthShadowViewMaxOpacity = 0.8f
 
@@ -88,6 +90,7 @@ internal object Constants {
             const val emojiIdImageViewAnimDelayMs = 200L
             const val yourEmojiIdTextAnimDelayMs = 300L
             const val yourEmojiIdTextAnimDurationMs = 300L
+            const val fadeOutAnimDurationMs = 800L
         }
 
         object CreateWallet {
@@ -117,6 +120,16 @@ internal object Constants {
 
         object Splash {
             const val createWalletStartUpDelayMs = 3000L
+        }
+
+        object Auth {
+            const val viewFadeoutAnimMs = 100L
+            const val viewFadeAnimDelayMs = 200L
+            const val localAuthAnimDurationMs = 800L
+            const val removeFragmentDelayDuration = 800L
+            const val touchIdPromptFadeInAnimDelayDuration = 300L
+            const val touchIdPromptDurationMs = 800L
+            const val touchIdPromptFadeOutAnimDelayDuration = 2000L
         }
     }
 

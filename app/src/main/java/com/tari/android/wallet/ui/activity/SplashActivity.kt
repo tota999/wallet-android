@@ -65,7 +65,7 @@ class SplashActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         // check whether there's an existing wallet
         val walletExists = File(walletFilesDirPath).list()!!.isNotEmpty()
-        if (walletExists && sharedPrefsWrapper.onboardingCompleted) {
+        if (walletExists && sharedPrefsWrapper.onboardingAuthSetupCompleted) {
             uiHandler.postDelayed({
                 startAuthActivity()
             }, Splash.createWalletStartUpDelayMs)
@@ -74,6 +74,10 @@ class SplashActivity : BaseActivity() {
                 startOnboardingActivity()
             }, Splash.createWalletStartUpDelayMs)
         }
+    }
+
+    override fun onBackPressed() {
+        // no-op
     }
 
     private fun startOnboardingActivity() {

@@ -38,6 +38,9 @@ import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import dagger.Module
 import dagger.Provides
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -47,14 +50,14 @@ import javax.inject.Singleton
  * @author The Tari Development Team
  */
 @Module
-class WalletModule {
+internal class WalletModule {
 
     object FieldName {
         const val walletFilesDirPath = "wallet_files_dir_path"
         const val walletLogFilePath = "wallet_log_file_path"
     }
 
-    private val logFileName = "tari_wallet.log"
+    private val logFilePrefix = "tari_wallet_"
 
     /**
      * The directory in which the wallet files reside.
@@ -69,7 +72,10 @@ class WalletModule {
     @Provides
     @Named(FieldName.walletLogFilePath)
     internal fun provideWalletLogFilePath(@Named(FieldName.walletFilesDirPath) walletFilesDirPath: String): String {
-        return "$walletFilesDirPath/$logFileName"
+        val timeStamp = SimpleDateFormat("YYYYMMdd", Locale.getDefault()).format(Date()) +
+                "_${System.currentTimeMillis()}"
+
+        return "$walletFilesDirPath/$logFilePrefix$timeStamp.log"
     }
 
     /**
@@ -87,18 +93,56 @@ class WalletModule {
     }
 
     /**
+     * Provides transport for wallet to use
+     */
+    @Provides
+    @Singleton
+    internal fun provideTorTransport(
+        torConfig: TorConfig
+    ): FFITransportType {
+
+
+        val cookieFile = File(torConfig.cookieFilePath)
+        var cookieString = ByteArray(0)
+        if (cookieFile.exists()) {
+            cookieString = cookieFile.readBytes()
+        }
+
+        val torCookie = FFIByteVector(cookieString)
+        var torIdentity = FFIByteVector(nullptr)
+        if (torConfig.identity.isNotEmpty()) {
+            torIdentity.destroy()
+            torIdentity = FFIByteVector(torConfig.identity)
+        }
+        return FFITransportType(
+            NetAddressString(
+                torConfig.controlHost,
+                torConfig.controlPort
+            ),
+            torConfig.connectionPort,
+            torCookie,
+            torIdentity,
+            torConfig.sock5Username,
+            torConfig.sock5Password
+        )
+    }
+
+    /**
      * Provides CommsConfig object for wallet configuration.
      */
     @Provides
     @Singleton
     internal fun provideCommsConfig(
         sharedPrefsWrapper: SharedPrefsWrapper,
-        @Named(FieldName.walletFilesDirPath) walletFilesDirPath: String
+        @Named(FieldName.walletFilesDirPath) walletFilesDirPath: String,
+        transport: FFITransportType
     ): FFICommsConfig {
-        //TODO: Change to tor
-        val transport = FFITransportType()
         return FFICommsConfig(
-            Constants.Wallet.WALLET_LISTENER_ADDRESS,
+            NetAddressString(
+                "127.0.0.1",
+                39069
+            ).toString(),
+            //transport.getAddress(),
             transport,
             Constants.Wallet.WALLET_DB_NAME,
             walletFilesDirPath,
@@ -124,6 +168,16 @@ class WalletModule {
             sharedPrefsWrapper.publicKeyHexString = publicKeyFFI.toString()
             sharedPrefsWrapper.emojiId = publicKeyFFI.getEmojiNodeId()
             publicKeyFFI.destroy()
+            //Todo: Below needs to be run once on first run
+
+            val baseNodeKeyFFI =
+                FFIPublicKey(HexString("90d8fe54c377ecabff383f7d8f0ba708c5b5d2a60590f326fbf1a2e74ea2441f"))
+            val baseNodeAddress =
+                "/onion3/plvcskybsckbfeubywjbmpnbm4kjqm2ip6kbwimakaim6xyucydpityd:18001"
+            wallet.addBaseNodePeer(baseNodeKeyFFI, baseNodeAddress)
+
+            baseNodeKeyFFI.destroy()
+
 
         }
         return FFITestWallet.instance!!

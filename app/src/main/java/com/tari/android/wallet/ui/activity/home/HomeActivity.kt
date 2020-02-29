@@ -70,13 +70,15 @@ import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.activity.home.adapter.TxListAdapter
 import com.tari.android.wallet.ui.activity.log.DebugLogActivity
-import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.profile.WalletInfoActivity
+import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
 import com.tari.android.wallet.ui.extension.scrollToTop
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
+import org.matomo.sdk.Tracker
+import org.matomo.sdk.extra.TrackHelper
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 import kotlin.math.max
@@ -88,7 +90,7 @@ import kotlin.math.min
  * @author The Tari Development Team
  */
 
-class HomeActivity : BaseActivity(),
+internal class HomeActivity : BaseActivity(),
     ServiceConnection,
     SwipeRefreshLayout.OnRefreshListener,
     View.OnScrollChangeListener,
@@ -203,16 +205,18 @@ class HomeActivity : BaseActivity(),
     @JvmField
     var whiteColor = 0
 
-    @BindString(R.string.service_error_testnet_tari_request)
+    @BindString(R.string.wallet_service_error_testnet_tari_request)
     @JvmField
     var homeFailToLoadTransaction = ""
 
-    @BindString(R.string.service_error_no_internet_connection)
+    @BindString(R.string.wallet_service_error_no_internet_connection)
     @JvmField
     var homeNoInternetConnection = ""
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+    @Inject
+    lateinit var tracker: Tracker
 
     // tx list
     private lateinit var recyclerViewAdapter: TxListAdapter
@@ -240,6 +244,7 @@ class HomeActivity : BaseActivity(),
     private var walletService: TariWalletService? = null
     private val wr = WeakReference(this)
     private val uiHandler = Handler(Looper.getMainLooper())
+    private val handler = Handler()
 
     /**
      * Whether the user is currently dragging the list view.
@@ -294,6 +299,10 @@ class HomeActivity : BaseActivity(),
         }
 
         subscribeToEventBus()
+        TrackHelper.track()
+            .screen("/home")
+            .title("Home - Transaction List")
+            .with(tracker)
     }
 
     override fun onStart() {
@@ -306,6 +315,7 @@ class HomeActivity : BaseActivity(),
         super.onStop()
     }
 
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onDestroy() {
         recyclerView.layoutManager = null
@@ -314,6 +324,11 @@ class HomeActivity : BaseActivity(),
         unbindService(this)
         EventBus.unsubscribe(this)
         super.onDestroy()
+    }
+
+    override fun onBackPressed() {
+        // we're at the root activity,
+        // do nothing when back is pressed
     }
 
     // endregion
@@ -393,6 +408,11 @@ class HomeActivity : BaseActivity(),
             }
         }
         EventBus.subscribe<Event.Contact.ContactAddedOrUpdated>(this) {
+            wr.get()?.rootView?.post {
+                updateAllDataAndUI(restartBalanceUI = false)
+            }
+        }
+        EventBus.subscribe<Event.Wallet.TxReceived>(this) {
             wr.get()?.rootView?.post {
                 updateAllDataAndUI(restartBalanceUI = false)
             }
@@ -668,7 +688,7 @@ class HomeActivity : BaseActivity(),
         noTxsInfoTextView.alpha = 0f
         noTxsInfoTextView.visibility = View.VISIBLE
         val anim = ObjectAnimator.ofFloat(noTxsInfoTextView, "alpha", 0f, 1f)
-        anim.duration = Constants.UI.mediumAnimDurationMs
+        anim.duration = Constants.UI.mediumDurationMs
         anim.start()
     }
 
@@ -710,7 +730,7 @@ class HomeActivity : BaseActivity(),
                     dismiss()
                     rootView.postDelayed({
                         showSendTariButtonAnimated()
-                    }, Constants.UI.shortAnimDurationMs)
+                    }, Constants.UI.shortDurationMs)
                 }
             findViewById<TextView>(R.id.home_tari_bot_dialog_btn_send_tari)
                 .setOnClickListener {
@@ -718,7 +738,7 @@ class HomeActivity : BaseActivity(),
                     sendTariToTestnetSender(senderPublicKey)
                     rootView.postDelayed({
                         showSendTariButtonAnimated()
-                    }, Constants.UI.longAnimDurationMs)
+                    }, Constants.UI.longDurationMs)
 
                 }
             window?.setGravity(Gravity.BOTTOM)
@@ -772,7 +792,10 @@ class HomeActivity : BaseActivity(),
         updateAllDataAndUI(restartBalanceUI = false)
         // request Testnet Tari if no txs
         if (txListIsEmpty) {
-            wr.get()?.requestTestnetTari()
+            handler.postDelayed({
+                wr.get()?.requestTestnetTari()
+            }, Constants.UI.xxLongDurationMs)
+
         } else {
             showSendTariButtonAnimated()
         }
@@ -794,7 +817,7 @@ class HomeActivity : BaseActivity(),
             val value = valueAnimator.animatedValue as Int
             scrollContentView.y = value.toFloat()
         }
-        anim.duration = Constants.UI.longAnimDurationMs
+        anim.duration = Constants.UI.longDurationMs
         anim.interpolator = EasingInterpolator(Ease.EASE_OUT_EXPO)
         anim.start()
 
@@ -883,7 +906,7 @@ class HomeActivity : BaseActivity(),
             )
             sendTariButtonBgGradientView.alpha = value
         }
-        anim.duration = Constants.UI.mediumAnimDurationMs
+        anim.duration = Constants.UI.mediumDurationMs
         anim.interpolator = EasingInterpolator(Ease.EASE_OUT_EXPO)
         anim.start()
         sendTariButtonIsVisible = true
@@ -910,7 +933,7 @@ class HomeActivity : BaseActivity(),
             )
             sendTariButtonBgGradientView.alpha = 1f - value
         }
-        anim.duration = Constants.UI.mediumAnimDurationMs
+        anim.duration = Constants.UI.mediumDurationMs
         anim.interpolator = EasingInterpolator(Ease.EASE_OUT_EXPO)
         anim.start()
         sendTariButtonIsVisible = false
