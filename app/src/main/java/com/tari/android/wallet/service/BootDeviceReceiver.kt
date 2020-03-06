@@ -30,28 +30,45 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.service;
+package com.tari.android.wallet.service
 
-// import listener class
-import com.tari.android.wallet.service.TariTorServiceListener;
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import androidx.core.content.ContextCompat
+import com.orhanobut.logger.Logger
+import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.di.WalletModule
+import com.tari.android.wallet.util.SharedPrefsWrapper
+import java.io.File
+import javax.inject.Inject
+import javax.inject.Named
 
-interface TariTorService {
+/**
+ * This receiver is responsible for starting the service after boot finish.
+ *
+ * @author The Tari Development Team
+ */
+class BootDeviceReceiver : BroadcastReceiver() {
 
-    /**
-    * Registers new Tor service listener.
-    * Registered listener will be unregistered on death.
-    */
-    void registerListener(TariTorServiceListener listener);
+    @Inject
+    @Named(WalletModule.FieldName.walletFilesDirPath)
+    lateinit var walletFilesDirPath: String
+    @Inject
+    internal lateinit var sharedPrefsWrapper: SharedPrefsWrapper
 
-    /**
-    * Unregisters Tor service listener.
-    */
-    void unregisterListener(TariTorServiceListener listener);
+    override fun onReceive(context: Context?, intent: Intent?) {
+        if (context == null || intent == null) return
+        Logger.d("Boot device broadcast received.")
 
-    /**
-    * Starts TOR with given config, it's a non-blocking function. Callers should use listener
-    * for error notifications
-    */
-    void start(int socksPort, String controlHost, int controlPort, String sock5Username, String sock5Password);
+        (context.applicationContext as TariWalletApplication).appComponent.inject(this)
 
+        val walletExists = File(walletFilesDirPath).list()!!.isNotEmpty()
+        if (walletExists && sharedPrefsWrapper.onboardingAuthSetupCompleted && Intent.ACTION_BOOT_COMPLETED == intent.action) {
+            ContextCompat.startForegroundService(
+                context,
+                Intent(context, WalletService::class.java)
+            )
+        }
+    }
 }

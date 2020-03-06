@@ -64,6 +64,7 @@ internal class WalletModule {
      */
     @Provides
     @Named(FieldName.walletFilesDirPath)
+    @Singleton
     internal fun provideWalletFilesDirPath(context: Context): String = context.filesDir.absolutePath
 
     /**
@@ -71,11 +72,16 @@ internal class WalletModule {
      */
     @Provides
     @Named(FieldName.walletLogFilePath)
+    @Singleton
     internal fun provideWalletLogFilePath(@Named(FieldName.walletFilesDirPath) walletFilesDirPath: String): String {
         val timeStamp = SimpleDateFormat("YYYYMMdd", Locale.getDefault()).format(Date()) +
                 "_${System.currentTimeMillis()}"
-
-        return "$walletFilesDirPath/$logFilePrefix$timeStamp.log"
+        val logFilePath = "$walletFilesDirPath/$logFilePrefix$timeStamp.log"
+        val logFile = File(logFilePath)
+        if (!logFile.exists()) {
+            logFile.createNewFile()
+        }
+        return logFilePath
     }
 
     /**
@@ -90,41 +96,6 @@ internal class WalletModule {
             sharedPrefsWrapper.privateKeyHexString = hexString
         }
         return HexString(hexString)
-    }
-
-    /**
-     * Provides transport for wallet to use
-     */
-    @Provides
-    @Singleton
-    internal fun provideTorTransport(
-        torConfig: TorConfig
-    ): FFITransportType {
-
-
-        val cookieFile = File(torConfig.cookieFilePath)
-        var cookieString = ByteArray(0)
-        if (cookieFile.exists()) {
-            cookieString = cookieFile.readBytes()
-        }
-
-        val torCookie = FFIByteVector(cookieString)
-        var torIdentity = FFIByteVector(nullptr)
-        if (torConfig.identity.isNotEmpty()) {
-            torIdentity.destroy()
-            torIdentity = FFIByteVector(torConfig.identity)
-        }
-        return FFITransportType(
-            NetAddressString(
-                torConfig.controlHost,
-                torConfig.controlPort
-            ),
-            torConfig.connectionPort,
-            torCookie,
-            torIdentity,
-            torConfig.sock5Username,
-            torConfig.sock5Password
-        )
     }
 
     /**
@@ -144,7 +115,7 @@ internal class WalletModule {
             ).toString(),
             //transport.getAddress(),
             transport,
-            Constants.Wallet.WALLET_DB_NAME,
+            Constants.Wallet.walletDBName,
             walletFilesDirPath,
             FFIPrivateKey((getPrivateKeyHexString(sharedPrefsWrapper)))
         )
@@ -168,17 +139,17 @@ internal class WalletModule {
             sharedPrefsWrapper.publicKeyHexString = publicKeyFFI.toString()
             sharedPrefsWrapper.emojiId = publicKeyFFI.getEmojiNodeId()
             publicKeyFFI.destroy()
-            //Todo: Below needs to be run once on first run
 
-            val baseNodeKeyFFI =
-                FFIPublicKey(HexString("90d8fe54c377ecabff383f7d8f0ba708c5b5d2a60590f326fbf1a2e74ea2441f"))
-            val baseNodeAddress =
-                "/onion3/plvcskybsckbfeubywjbmpnbm4kjqm2ip6kbwimakaim6xyucydpityd:18001"
-            wallet.addBaseNodePeer(baseNodeKeyFFI, baseNodeAddress)
+            // add base node
+            if (sharedPrefsWrapper.baseNodePublicKeyHex == null) {
+                sharedPrefsWrapper.baseNodePublicKeyHex = Constants.Wallet.baseNodePublicKeyHex
+                sharedPrefsWrapper.baseNodeAddress = Constants.Wallet.baseNodeAddress
 
-            baseNodeKeyFFI.destroy()
-
-
+                val baseNodeKeyFFI = FFIPublicKey(HexString(Constants.Wallet.baseNodePublicKeyHex))
+                val baseNodeAddress = Constants.Wallet.baseNodeAddress
+                wallet.addBaseNodePeer(baseNodeKeyFFI, baseNodeAddress)
+                baseNodeKeyFFI.destroy()
+            }
         }
         return FFITestWallet.instance!!
     }

@@ -30,17 +30,18 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.util
-
-import android.app.ActivityManager
-import android.content.Context
-import android.os.Process
+package com.tari.android.wallet.tor
 
 /**
- * Provides name of the process this context is running in
+ * Tor proxy configuration.
  */
-fun getProcessNameCompat(context: Context): String? {
-    val pid = Process.myPid()
-    val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
-    return manager?.runningAppProcesses?.filterNotNull()?.firstOrNull { it.pid == pid }?.processName
-}
+data class TorConfig(
+    val proxyPort: Int,
+    val controlHost: String,
+    val controlPort: Int,
+    val connectionPort: Int,
+    val cookieFilePath: String,
+    val identity: ByteArray,
+    val sock5Username: String,
+    val sock5Password: String
+)
