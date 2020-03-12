@@ -46,28 +46,28 @@ internal class FFIPendingInboundTx constructor(pointer: FFIPendingInboundTxPtr) 
 
     // region JNI
 
-    private external fun jniGetId(ptr: FFIPendingInboundTxPtr, libError: FFIError): ByteArray
+    private external fun jniGetId(libError: FFIError): ByteArray
     private external fun jniGetSourcePublicKey(
-        ptr: FFIPendingInboundTxPtr,
         libError: FFIError
     ): FFIPublicKeyPtr
 
     private external fun jniGetAmount(
-        ptr: FFIPendingInboundTxPtr,
         libError: FFIError
     ): ByteArray
 
     private external fun jniGetTimestamp(
-        ptr: FFIPendingInboundTxPtr,
         libError: FFIError
     ): ByteArray
 
     private external fun jniGetMessage(
-        ptr: FFIPendingInboundTxPtr,
         libError: FFIError
     ): String
 
-    private external fun jniDestroy(ptr: FFIPendingInboundTxPtr)
+    private external fun jniGetStatus(
+        libError: FFIError
+    ): Int
+
+    private external fun jniDestroy()
 
     // endregion
 
@@ -83,42 +83,57 @@ internal class FFIPendingInboundTx constructor(pointer: FFIPendingInboundTxPtr) 
 
     fun getId(): BigInteger {
         val error = FFIError()
-        val bytes = jniGetId(ptr, error)
+        val bytes = jniGetId(error)
         throwIf(error)
         return BigInteger(1, bytes)
     }
 
     fun getSourcePublicKey(): FFIPublicKey {
         val error = FFIError()
-        val result = FFIPublicKey(jniGetSourcePublicKey(ptr, error))
+        val result = FFIPublicKey(jniGetSourcePublicKey(error))
         throwIf(error)
         return result
     }
 
     fun getAmount(): BigInteger {
         val error = FFIError()
-        val bytes = jniGetAmount(ptr, error)
+        val bytes = jniGetAmount(error)
         throwIf(error)
         return BigInteger(1, bytes)
     }
 
     fun getTimestamp(): BigInteger {
         val error = FFIError()
-        val bytes = jniGetTimestamp(ptr, error)
+        val bytes = jniGetTimestamp(error)
         throwIf(error)
         return BigInteger(1, bytes)
     }
 
     fun getMessage(): String {
         val error = FFIError()
-        val result = jniGetMessage(ptr, error)
+        val result = jniGetMessage(error)
         throwIf(error)
         return result
     }
 
+    fun getStatus(): FFIStatus {
+        val error = FFIError()
+        val status = jniGetStatus(error)
+        throwIf(error)
+        return when (status) {
+            -1 -> FFIStatus.TX_NULL_ERROR
+            0 -> FFIStatus.COMPLETED
+            1 -> FFIStatus.BROADCAST
+            2 -> FFIStatus.MINED
+            3 -> FFIStatus.IMPORTED
+            4 -> FFIStatus.PENDING
+            5 -> FFIStatus.UNKNOWN
+            else -> throw FFIException(message = "Unexpected status: $status")
+        }
+    }
+
     override fun destroy() {
-        jniDestroy(ptr)
-        ptr = nullptr
+        jniDestroy()
     }
 
 }

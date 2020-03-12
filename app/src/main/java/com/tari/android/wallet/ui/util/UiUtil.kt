@@ -51,6 +51,7 @@ import androidx.annotation.NonNull
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import com.google.zxing.BarcodeFormat
+import com.google.zxing.EncodeHintType
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
@@ -134,6 +135,13 @@ internal object UiUtil {
     ): Int {
         val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
         return layoutParams.bottomMargin
+    }
+
+    fun getStartMargin(
+        @NonNull view: View
+    ): Int {
+        val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
+        return layoutParams.marginStart
     }
 
     fun setStartMargin(
@@ -267,10 +275,11 @@ internal object UiUtil {
     fun getQREncodedBitmap(content: String, size: Int): Bitmap? {
         try {
             val barcodeEncoder = BarcodeEncoder()
-            return barcodeEncoder.encodeBitmap(
-                content,
-                BarcodeFormat.QR_CODE, size, size
-            )
+            val hints: HashMap<EncodeHintType, String> = HashMap()
+            hints[EncodeHintType.CHARACTER_SET] = "UTF-8";
+
+            val map = barcodeEncoder.encode(content, BarcodeFormat.QR_CODE, size, size, hints)
+            return barcodeEncoder.createBitmap(map)
         } catch (e: Exception) {
         }
         return null

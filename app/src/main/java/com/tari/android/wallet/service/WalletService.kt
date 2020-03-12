@@ -77,6 +77,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
      * Service stub implementation.
      */
     private val serviceImpl = TariWalletServiceImpl()
+
     /**
      * Registered listeners.
      */
@@ -587,11 +588,13 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             val sourcePublicKeyFFI = completedTxFFI.getSourcePublicKey()
             val destinationPublicKeyFFI = completedTxFFI.getDestinationPublicKey()
             val status = when (completedTxFFI.getStatus()) {
-                FFICompletedTx.Status.TX_NULL_ERROR -> CompletedTx.Status.TX_NULL_ERROR
-                FFICompletedTx.Status.BROADCAST -> CompletedTx.Status.BROADCAST
-                FFICompletedTx.Status.COMPLETED -> CompletedTx.Status.COMPLETED
-                FFICompletedTx.Status.MINED -> CompletedTx.Status.MINED
-                FFICompletedTx.Status.UNKNOWN -> CompletedTx.Status.UNKNOWN
+                FFIStatus.TX_NULL_ERROR -> Status.TX_NULL_ERROR
+                FFIStatus.BROADCAST -> Status.BROADCAST
+                FFIStatus.COMPLETED -> Status.COMPLETED
+                FFIStatus.MINED -> Status.MINED
+                FFIStatus.IMPORTED -> Status.IMPORTED
+                FFIStatus.PENDING -> Status.PENDING
+                FFIStatus.UNKNOWN -> Status.UNKNOWN
             }
             val user: User
             val direction: Tx.Direction
@@ -644,6 +647,15 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             pendingInboundTxFFI: FFIPendingInboundTx,
             allContacts: List<Contact>
         ): PendingInboundTx {
+            val status = when (pendingInboundTxFFI.getStatus()) {
+                FFIStatus.TX_NULL_ERROR -> Status.TX_NULL_ERROR
+                FFIStatus.BROADCAST -> Status.BROADCAST
+                FFIStatus.COMPLETED -> Status.COMPLETED
+                FFIStatus.MINED -> Status.MINED
+                FFIStatus.IMPORTED -> Status.IMPORTED
+                FFIStatus.PENDING -> Status.PENDING
+                FFIStatus.UNKNOWN -> Status.UNKNOWN
+            }
             val sourcePublicKeyFFI = pendingInboundTxFFI.getSourcePublicKey()
             val userPublicKey = PublicKey(
                 sourcePublicKeyFFI.toString(),
@@ -658,7 +670,8 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                 user,
                 MicroTari(pendingInboundTxFFI.getAmount()),
                 pendingInboundTxFFI.getTimestamp(),
-                pendingInboundTxFFI.getMessage()
+                pendingInboundTxFFI.getMessage(),
+                status
             )
             // destroy native objects
             sourcePublicKeyFFI.destroy()
@@ -669,6 +682,15 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             pendingOutboundTxFFI: FFIPendingOutboundTx,
             allContacts: List<Contact>
         ): PendingOutboundTx {
+            val status = when (pendingOutboundTxFFI.getStatus()) {
+                FFIStatus.TX_NULL_ERROR -> Status.TX_NULL_ERROR
+                FFIStatus.BROADCAST -> Status.BROADCAST
+                FFIStatus.COMPLETED -> Status.COMPLETED
+                FFIStatus.MINED -> Status.MINED
+                FFIStatus.IMPORTED -> Status.IMPORTED
+                FFIStatus.PENDING -> Status.PENDING
+                FFIStatus.UNKNOWN -> Status.UNKNOWN
+            }
             val destinationPublicKeyFFI = pendingOutboundTxFFI.getDestinationPublicKey()
             val userPublicKey = PublicKey(
                 destinationPublicKeyFFI.toString(),
@@ -683,7 +705,8 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                 user,
                 MicroTari(pendingOutboundTxFFI.getAmount()),
                 pendingOutboundTxFFI.getTimestamp(),
-                pendingOutboundTxFFI.getMessage()
+                pendingOutboundTxFFI.getMessage(),
+                status
             )
             // destroy native objects
             destinationPublicKeyFFI.destroy()
@@ -785,6 +808,39 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                 mapThrowableIntoError(throwable, error)
             }
         }
+
+        /**
+         * @return public key constructed from input emoji id. Null if the emoji id is invalid
+         * or it does not correspond to a public key.
+         */
+        override fun getPublicKeyFromEmojiId(emojiId: String?): PublicKey? {
+            try {
+                FFIPublicKey(emojiId ?: "").run {
+                    val publicKey = publicKeyFromFFI(this)
+                    destroy()
+                    return publicKey
+                }
+            } catch (ignored: Throwable) {
+                return null
+            }
+        }
+
+        /**
+         * @return public key constructed from input public key hex string id. Null if the emoji id
+         * is invalid or it does not correspond to a public key.
+         */
+        override fun getPublicKeyFromHexString(publicKeyHex: String?): PublicKey? {
+            try {
+                FFIPublicKey(HexString(publicKeyHex ?: "")).run {
+                    val publicKey = publicKeyFromFFI(this)
+                    destroy()
+                    return publicKey
+                }
+            } catch (ignored: Throwable) {
+                return null
+            }
+        }
+
         // endregion
     }
 }

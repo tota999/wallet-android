@@ -40,6 +40,7 @@ package com.tari.android.wallet.model
 enum class WalletErrorCode(val code: Int) {
 
     NO_ERROR(0),
+
     /**
      * For any error with an unknown error code, or a different class than FFIError.
      */

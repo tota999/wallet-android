@@ -36,6 +36,22 @@
 #include <cmath>
 #include <android/log.h>
 
+
+inline jlong GetPointerField(JNIEnv *jEnv, jobject jThis)
+{
+    jclass cls = jEnv->GetObjectClass(jThis);
+    jfieldID fid = jEnv->GetFieldID(cls, "ptr", "J");
+    jlong lByteVector = jEnv->GetLongField(jThis,fid);
+    return lByteVector;
+}
+
+inline void SetPointerField(JNIEnv *jEnv, jobject jThis, jlong jPointer)
+{
+    jclass cls = jEnv->GetObjectClass(jThis);
+    jfieldID fid = jEnv->GetFieldID(cls, "ptr", "J");
+    jEnv->SetLongField(jThis,fid,jPointer);
+}
+
 // function included in multiple source files must be inline
 inline jbyteArray getBytesFromUnsignedLongLong(JNIEnv *jEnv, unsigned long long value) {
     const size_t size = sizeof(unsigned long long int);
@@ -57,10 +73,10 @@ inline jbyteArray getBytesFromUnsignedLongLong(JNIEnv *jEnv, unsigned long long 
 inline jboolean setErrorCode(JNIEnv *jEnv, jobject error, jint value) {
     jclass errorClass = jEnv->GetObjectClass(error);
     if (errorClass == NULL)
-        return false;
+        return static_cast<jboolean>(false);
     jfieldID errorField = jEnv->GetFieldID(errorClass, "code", "I");
     if (errorField == NULL)
-        return false;
+        return static_cast<jboolean>(false);
     jEnv->SetIntField(error, errorField, value);
-    return true;
+    return static_cast<jboolean>(true);
 }

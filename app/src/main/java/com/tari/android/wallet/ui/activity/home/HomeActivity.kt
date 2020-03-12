@@ -46,7 +46,10 @@ import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.os.*
-import android.view.*
+import android.view.Gravity
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.DecelerateInterpolator
@@ -89,7 +92,6 @@ import kotlin.math.min
  *
  * @author The Tari Development Team
  */
-
 internal class HomeActivity : BaseActivity(),
     ServiceConnection,
     SwipeRefreshLayout.OnRefreshListener,
@@ -397,6 +399,11 @@ internal class HomeActivity : BaseActivity(),
                 wr.get()?.onSendTxSuccessful()
             }
         }
+        EventBus.subscribe<Event.Wallet.DiscoveryComplete>(this) {
+            wr.get()?.rootView?.post {
+                updateAllDataAndUI(restartBalanceUI = false)
+            }
+        }
         EventBus.subscribe<Event.Testnet.TestnetTariRequestSuccessful>(this) { event ->
             wr.get()?.rootView?.post {
                 wr.get()?.testnetTariRequestSuccessful(event.senderPublicKey)
@@ -452,7 +459,7 @@ internal class HomeActivity : BaseActivity(),
             // balance info
             updateBalanceInfoData()
             // init list
-            wr.get()?.rootView?.post {
+            rootView.post {
                 wr.get()?.initializeTxListUI()
             }
         }
@@ -507,10 +514,6 @@ internal class HomeActivity : BaseActivity(),
         return true
     }
 
-    /**
-     * TODO
-     * Prepares the
-     */
     private fun initializeTxListUI() {
         if (txListIsEmpty && !sharedPrefsWrapper.onboardingDisplayedAtHome) {
             isOnboarding = true
@@ -522,10 +525,6 @@ internal class HomeActivity : BaseActivity(),
             playNonOnboardingStartupAnim()
             if (txListIsEmpty) {
                 showNoTxsTextView()
-                AsyncTask.execute {
-                    wr.get()?.requestTestnetTari()
-                }
-
             }
         }
     }
@@ -635,7 +634,6 @@ internal class HomeActivity : BaseActivity(),
      */
     private fun playOnboardingAnim() {
         onboardingContentView.visibility = View.VISIBLE
-        scrollView.translationY = scrollView.height.toFloat()
         swipeRefreshLayout.isEnabled = false
         hideSendTariButtonAnimated()
 
@@ -650,7 +648,6 @@ internal class HomeActivity : BaseActivity(),
             )
 
         scrollView.scrollTo(0, scrollView.height)
-        scrollView.translationY = scrollView.height.toFloat()
         scrollContentView.alpha = 1f
         // scroll view translation animation
         val scrollViewTransAnim =
@@ -658,7 +655,7 @@ internal class HomeActivity : BaseActivity(),
                 scrollView,
                 View.TRANSLATION_Y,
                 scrollView.height.toFloat(),
-                0f
+                homeMainContentTopMargin.toFloat()
             )
         // background fade animation
         val blackBgViewFadeAnim = ValueAnimator.ofFloat(0f, 1f)

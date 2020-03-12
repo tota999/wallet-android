@@ -32,6 +32,8 @@
  */
 package com.tari.android.wallet.ffi
 
+import java.math.BigInteger
+
 /**
  * Test wallet implementation. Contains only the test functions to separate concerns with
  * the actual wallet implementation.
@@ -48,36 +50,31 @@ internal class FFITestWallet(commsConfig: FFICommsConfig, logPath: String) :
     // region JNI
 
     private external fun jniGenerateTestData(
-        walletPtr: FFIWalletPtr,
         datastorePath: String,
         libError: FFIError
     ): Boolean
 
     private external fun jniTestBroadcastTx(
-        walletPtr: FFIWalletPtr,
-        txPtr: FFIPendingInboundTxPtr,
+        txPtr: String,
         libError: FFIError
     ): Boolean
 
     private external fun jniTestFinalizeReceivedTx(
-        walletPtr: FFIWalletPtr,
-        txPtr: FFIPendingInboundTxPtr,
+        txPtr: FFIPendingInboundTx,
         libError: FFIError
     ): Boolean
 
     private external fun jniTestCompleteSentTx(
-        walletPtr: FFIWalletPtr,
-        txPtr: FFIPendingOutboundTxPtr,
+        txPtr: FFIPendingOutboundTx,
         libError: FFIError
     ): Boolean
 
-    private external fun jniTestMineCompletedTx(
-        walletPtr: FFIWalletPtr,
-        txPtr: FFICompletedTxPtr,
+    private external fun jniTestMineTx(
+        txId: String,
         libError: FFIError
     ): Boolean
 
-    private external fun jniTestReceiveTx(walletPtr: FFIWalletPtr, libError: FFIError): Boolean
+    private external fun jniTestReceiveTx(libError: FFIError): Boolean
 
     // endregion
 
@@ -86,42 +83,42 @@ internal class FFITestWallet(commsConfig: FFICommsConfig, logPath: String) :
 
     fun generateTestData(datastorePath: String): Boolean {
         val error = FFIError()
-        val result = jniGenerateTestData(getPointer(), datastorePath, error)
+        val result = jniGenerateTestData(datastorePath, error)
         throwIf(error)
         return result
     }
 
-    fun testBroadcastTx(tx: FFICompletedTx): Boolean {
+    fun testBroadcastTx(tx: BigInteger): Boolean {
         val error = FFIError()
-        val result = jniTestBroadcastTx(getPointer(), tx.getPointer(), error)
+        val result = jniTestBroadcastTx(tx.toString(), error)
         throwIf(error)
         return result
     }
 
     fun testCompleteSentTx(tx: FFIPendingOutboundTx): Boolean {
         val error = FFIError()
-        val result = jniTestCompleteSentTx(getPointer(), tx.getPointer(), error)
+        val result = jniTestCompleteSentTx(tx, error)
         throwIf(error)
         return result
     }
 
-    fun testMineCompletedTx(tx: FFICompletedTx): Boolean {
+    fun testMineTx(tx: BigInteger): Boolean {
         val error = FFIError()
-        val result = jniTestMineCompletedTx(getPointer(), tx.getPointer(), error)
+        val result = jniTestMineTx(tx.toString(), error)
         throwIf(error)
         return result
     }
 
     fun testFinalizeReceivedTx(tx: FFIPendingInboundTx): Boolean {
         val error = FFIError()
-        val result = jniTestFinalizeReceivedTx(getPointer(), tx.getPointer(), error)
+        val result = jniTestFinalizeReceivedTx(tx, error)
         throwIf(error)
         return result
     }
 
     fun testReceiveTx(): Boolean {
         val error = FFIError()
-        val result = jniTestReceiveTx(getPointer(), error)
+        val result = jniTestReceiveTx(error)
         throwIf(error)
         return result
     }
