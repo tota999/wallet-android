@@ -60,9 +60,8 @@ import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.BaseActivity
-import com.tari.android.wallet.ui.component.CustomFontButton
-import com.tari.android.wallet.ui.component.CustomFontEditText
-import com.tari.android.wallet.ui.component.CustomFontTextView
+import com.tari.android.wallet.ui.component.*
+import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.extension.getFirstChild
 import com.tari.android.wallet.ui.extension.getLastChild
@@ -86,8 +85,6 @@ import javax.inject.Inject
 internal class TxDetailActivity :
     BaseActivity(),
     ServiceConnection {
-
-    override val contentViewId = R.layout.activity_tx_detail
 
     companion object {
         const val TX_DETAIL_EXTRA_KEY = "TX_DETAIL_EXTRA_KEY"
@@ -138,6 +135,8 @@ internal class TxDetailActivity :
     lateinit var noteLabelView: View
     @BindView(R.id.tx_detail_vw_tx_fee_group)
     lateinit var txFeeGroup: Group
+    @BindView(R.id.tx_detail_txt_from)
+    lateinit var fromTextView: CustomFontTextView
     /**
      * Dimmers.
      */
@@ -156,6 +155,8 @@ internal class TxDetailActivity :
     lateinit var fullEmojiIdTextView: TextView
     @BindView(R.id.tx_detail_vw_copy_emoji_id_container)
     lateinit var copyEmojiIdButtonContainerView: View
+    @BindView(R.id.tx_detail_vw_emoji_id_copied)
+    lateinit var emojiIdCopiedAnimView: View
 
     /**
      * Emoji id chunk separator char.
@@ -174,6 +175,12 @@ internal class TxDetailActivity :
     @JvmField
     @BindString(R.string.tx_detail_pending_payment_sent)
     var pendingPaymentSent = ""
+    @JvmField
+    @BindString(R.string.common_from)
+    var paymentFrom = ""
+    @JvmField
+    @BindString(R.string.common_to)
+    var paymentTo = ""
 
     @JvmField
     @BindColor(R.color.tx_detail_contact_name_label_text)
@@ -197,7 +204,6 @@ internal class TxDetailActivity :
 
     @Inject
     lateinit var tracker: Tracker
-
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
 
@@ -211,6 +217,13 @@ internal class TxDetailActivity :
 
     private lateinit var tx: Tx
     private lateinit var emojiIdSummaryController: EmojiIdSummaryViewController
+
+    /**
+     * Animates the emoji id "copied" text.
+     */
+    private lateinit var emojiIdCopiedViewController: EmojiIdCopiedViewController
+
+    override val contentViewId = R.layout.activity_tx_detail
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -278,6 +291,18 @@ internal class TxDetailActivity :
             else -> throw RuntimeException("Unexpected transaction type for transaction: " + tx.id)
         }
 
+        fromTextView.text = when (tx) {
+            is CompletedTx -> {
+                when (tx.direction) {
+                    Tx.Direction.INBOUND -> paymentFrom
+                    Tx.Direction.OUTBOUND -> paymentTo
+                }
+            }
+            is PendingInboundTx -> paymentFrom
+            is PendingOutboundTx -> paymentTo
+            else -> throw RuntimeException("Unexpected transaction type for transaction: " + tx.id)
+        }
+
         val timestamp = tx.timestamp.toLong() * 1000
         txDateTextView.text = Date(timestamp).txFormattedDate()
         txAmountTextView.text = WalletUtil.amountFormatter.format(tx.amount.tariValue)
@@ -298,7 +323,9 @@ internal class TxDetailActivity :
             addContactButton.visibility = View.VISIBLE
             contactContainerView.visibility = View.GONE
         }
-        if ((tx as? CompletedTx)?.direction == Tx.Direction.OUTBOUND) {
+        if ((tx as? CompletedTx)?.direction == Tx.Direction.OUTBOUND ||
+            (tx as? PendingOutboundTx)?.direction == Tx.Direction.OUTBOUND
+        ) {
             txFeeGroup.visibility = View.VISIBLE
             val fee = MicroTari((tx as CompletedTx).fee)
             txFeeTextView.text = "+${WalletUtil.feeFormatter.format(fee.tariValue)}"
@@ -313,10 +340,9 @@ internal class TxDetailActivity :
             emojiIdChunkSeparator
         )
         fullEmojiIdContainerView.visibility = View.GONE
-        dimmerViews.forEach { dimmerView ->
-            dimmerView.visibility = View.GONE
-        }
+        dimmerViews.forEach { dimmerView -> dimmerView.visibility = View.GONE }
         copyEmojiIdButtonContainerView.visibility = View.GONE
+        emojiIdCopiedViewController = EmojiIdCopiedViewController(emojiIdCopiedAnimView)
     }
 
     /**
@@ -350,6 +376,8 @@ internal class TxDetailActivity :
     }
 
     private fun showFullEmojiId() {
+        // make dimmers non-clickable until the anim is over
+        dimmerViews.forEach { dimmerView -> dimmerView.isClickable = false }
         // prepare views
         emojiIdSummaryContainerView.visibility = View.INVISIBLE
         dimmerViews.forEach { dimmerView ->
@@ -412,13 +440,18 @@ internal class TxDetailActivity :
         val animSet = AnimatorSet()
         animSet.playSequentially(emojiIdAnim, copyEmojiIdButtonAnim)
         animSet.start()
+        animSet.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                dimmerViews.forEach { dimmerView -> dimmerView.isClickable = true }
+            }
+        })
         // scroll animation
         fullEmojiIdScrollView.postDelayed({
             fullEmojiIdScrollView.smoothScrollTo(0, 0)
         }, Constants.UI.shortDurationMs + 20)
     }
 
-    private fun hideFullEmojiId() {
+    private fun hideFullEmojiId(animateCopyEmojiIdButton: Boolean = true) {
         fullEmojiIdScrollView.smoothScrollTo(0, 0)
         emojiIdSummaryContainerView.visibility = View.VISIBLE
         // copy emoji id button anim
@@ -450,7 +483,11 @@ internal class TxDetailActivity :
         }
         // chain anim.s and start
         val animSet = AnimatorSet()
-        animSet.playSequentially(copyEmojiIdButtonAnim, emojiIdAnim)
+        if (animateCopyEmojiIdButton) {
+            animSet.playSequentially(copyEmojiIdButtonAnim, emojiIdAnim)
+        } else {
+            animSet.play(emojiIdAnim)
+        }
         animSet.start()
         animSet.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
@@ -465,13 +502,20 @@ internal class TxDetailActivity :
 
     @OnClick(R.id.tx_detail_btn_copy_emoji_id)
     fun onCopyEmojiIdButtonClicked(view: View) {
+        UiUtil.temporarilyDisableClick(view)
+        dimmerViews.forEach { dimmerView -> dimmerView.isClickable = false }
         val clipBoard = ContextCompat.getSystemService(this, ClipboardManager::class.java)
         val deepLinkClipboardData = ClipData.newPlainText(
             "Tari Wallet Emoji Id",
             EmojiUtil.getChunkedEmojiId(tx.user.publicKey.emojiId, emojiIdChunkSeparator)
         )
         clipBoard?.setPrimaryClip(deepLinkClipboardData)
-        hideFullEmojiId()
+        emojiIdCopiedViewController.showEmojiIdCopiedAnim(fadeOutOnEnd = true) {
+            hideFullEmojiId(animateCopyEmojiIdButton = false)
+        }
+        val copyEmojiIdButtonAnim = copyEmojiIdButtonContainerView.animate().alpha(0f)
+        copyEmojiIdButtonAnim.duration = Constants.UI.xShortDurationMs
+        copyEmojiIdButtonAnim.start()
     }
 
     /**
