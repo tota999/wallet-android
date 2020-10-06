@@ -57,6 +57,7 @@ import com.tari.android.wallet.service.connection.TariWalletServiceConnection.Ta
 import com.tari.android.wallet.ui.activity.SplashActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsActivity
+import com.tari.android.wallet.ui.activity.settings.BridgeConfigurationActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailsActivity
 import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.extension.color
@@ -203,6 +204,9 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
 
     override fun toBackupSettings() =
         startActivity(Intent(this, BackupSettingsActivity::class.java))
+
+    override fun toBridgeConfiguration() =
+        startActivity(Intent(this, BridgeConfigurationActivity::class.java))
 
     fun willNotifyAboutNewTx(): Boolean = ui.viewPager.currentItem == INDEX_HOME
 

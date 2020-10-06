@@ -313,13 +313,19 @@
     <string name="all_settings_close">Done</string>
     <string name="all_settings_security_label">Security</string>
     <string name="all_settings_back_up_wallet_settings_entry">Wallet Backups</string>
+    <string name="all_settings_advanced_settings_label">Advanced Settings</string>
     <string name="all_settings_secondary_settings_label">More</string>
+    <string name="all_settings_bridge_configuration">Bridge Configuration</string>
     <string name="all_settings_report_a_bug">Report a Bug</string>
     <string name="all_settings_visit_site">Visit Tari.com</string>
     <string name="all_settings_contribute">Contribute to Tari Aurora</string>
     <string name="all_settings_user_agreement">User Agreement</string>
     <string name="all_settings_privacy_policy">Privacy policy</string>
     <string name="all_settings_disclaimer">Disclaimer</string>
+
+    <!-- Bridge settings -->
+    <string name="bridge_settings_page_title">Bridges Configuration</string>
+    <string name="bridge_settings_connect_cta">Connect</string>
 
     <!-- Wallet back up -->
     <string name="back_up_wallet_page_title">Security</string>

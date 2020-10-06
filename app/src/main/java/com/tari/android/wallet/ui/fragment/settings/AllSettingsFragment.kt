@@ -109,6 +109,9 @@ UI tree rebuild on configuration changes"""
     }
 
     private fun bindCTAs() {
+        ui.bridgeConfigurationCtaView.setOnClickListener {
+            requireAuthorization { navigateToBridgeConfiguration() }
+        }
         ui.reportBugCtaView.setOnClickListener { shareBugReport() }
         ui.visitSiteCtaView.setOnClickListener { openLink(string(tari_url)) }
         ui.contributeCtaView.setOnClickListener { openLink(string(github_repo_url)) }
@@ -255,6 +258,10 @@ UI tree rebuild on configuration changes"""
         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(link)))
     }
 
+    private fun navigateToBridgeConfiguration() {
+        (requireActivity() as AllSettingsRouter).toBridgeConfiguration()
+    }
+
     private fun navigateToBackupSettings() {
         (requireActivity() as AllSettingsRouter).toBackupSettings()
     }
@@ -330,6 +337,7 @@ UI tree rebuild on configuration changes"""
 
     interface AllSettingsRouter {
         fun toBackupSettings()
+        fun toBridgeConfiguration()
     }
 
     companion object {

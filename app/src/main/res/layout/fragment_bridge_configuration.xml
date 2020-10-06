@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white">
+
+        <FrameLayout
+            android:id="@+id/back_cta_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/back_icon"
+                tools:ignore="ContentDescription" />
+
+        </FrameLayout>
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/page_title_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/bridge_settings_page_title"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:customFont="AVENIR_LT_STD_HEAVY"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="@string/bridge_settings_connect_cta"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:customFont="AVENIR_LT_STD_HEAVY"
+            app:layout_constraintBottom_toBottomOf="@id/page_title_text_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/page_title_text_view" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>
