@@ -326,6 +326,9 @@
     <!-- Bridge settings -->
     <string name="bridge_settings_page_title">Bridges Configuration</string>
     <string name="bridge_settings_connect_cta">Connect</string>
+    <string name="bridge_settings_disable_bridges_cta">No Bridges</string>
+    <string name="bridge_settings_configure_custom_bridges_cta">Custom Bridges</string>
+    <string name="bridge_settings_page_label">If you are in a country or using a connection that censors Tor, you might need to use bridges.</string>
 
     <!-- Wallet back up -->
     <string name="back_up_wallet_page_title">Security</string>

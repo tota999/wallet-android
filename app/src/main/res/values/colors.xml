@@ -94,6 +94,10 @@
 
     <!-- settings -->
     <color name="settings_background">#F6F6F6</color>
+    
+    <!-- bridge settings -->
+    <color name="bridge_settings_connect_cta_enabled">#922FFF</color>
+    <color name="bridge_settings_connect_cta_disabled">#3F922FFF</color>
 
     <!-- wallet restore -->
     <color name="wallet_restore_page_background">@color/settings_background</color>

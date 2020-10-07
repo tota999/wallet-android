@@ -158,8 +158,10 @@ UI tree rebuild on configuration changes"""
         ui.lastBackupTimeTextView.visible()
         val time = sharedPrefs.lastSuccessfulBackupDate?.toLocalDateTime()
         if (time == null) {
+            ui.lastBackupTimeTextView.gone()
             ui.lastBackupTimeTextView.text = ""
         } else {
+            ui.lastBackupTimeTextView.visible()
             ui.lastBackupTimeTextView.text = string(
                 back_up_wallet_last_successful_backup,
                 BACKUP_DATE_FORMATTER.print(time),

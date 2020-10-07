@@ -9,6 +9,7 @@ class BridgeConfigurationActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        overridePendingTransition(R.anim.enter_from_bottom, R.anim.exit_to_top)
         setContentView(R.layout.activity_fragment_container)
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
