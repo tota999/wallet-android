@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/settings_background"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white">
+
+        <FrameLayout
+            android:id="@+id/back_cta_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/back_icon"
+                tools:ignore="ContentDescription" />
+
+        </FrameLayout>
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/page_title_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/custom_bridge_settings_page_title"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:customFont="AVENIR_LT_STD_HEAVY"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="@string/bridge_settings_connect_cta"
+            android:textColor="@color/bridge_settings_connect_cta_enabled"
+            android:textSize="16sp"
+            app:customFont="AVENIR_LT_STD_MEDIUM"
+            app:layout_constraintBottom_toBottomOf="@id/page_title_text_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/page_title_text_view" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|start"
+        android:layout_marginHorizontal="26dp"
+        android:layout_marginTop="24dp"
+        android:text="@string/custom_bridge_settings_paste_bridges_label"
+        android:textColor="@color/black"
+        android:textSize="15sp"
+        app:customFont="AVENIR_LT_STD_MEDIUM" />
+
+    <com.tari.android.wallet.ui.component.CustomFontEditText
+        android:id="@+id/dialog_enter_text_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/white"
+        android:imeOptions="actionDone"
+        android:letterSpacing="0.02"
+        android:paddingHorizontal="26dp"
+        android:paddingVertical="24dp"
+        android:scrollHorizontally="false"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        app:customFont="AVENIR_LT_STD_ROMAN"
+        tools:hint="Enter text here…" />
+
+    <FrameLayout
+        android:id="@+id/request_bridges_cta_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/setting_option_background"
+        android:clickable="true"
+        android:focusable="true"
+        android:paddingHorizontal="26dp"
+        android:paddingVertical="24dp">
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|start"
+            android:text="@string/custom_bridge_settings_request_bridges_cta"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            app:customFont="AVENIR_LT_STD_MEDIUM" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:src="@drawable/icon_apply_setting"
+            tools:ignore="ContentDescription" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/scan_bridges_qr_cta_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/setting_option_background"
+        android:clickable="true"
+        android:focusable="true"
+        android:paddingHorizontal="26dp"
+        android:paddingVertical="24dp">
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|start"
+            android:text="@string/custom_bridge_settings_scan_qr_cta"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            app:customFont="AVENIR_LT_STD_MEDIUM" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:src="@drawable/icon_apply_setting"
+            tools:ignore="ContentDescription" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/upload_bridges_qr_cta_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/setting_option_background"
+        android:clickable="true"
+        android:focusable="true"
+        android:paddingHorizontal="26dp"
+        android:paddingVertical="24dp">
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|start"
+            android:text="@string/custom_bridge_settings_upload_qr_cta"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            app:customFont="AVENIR_LT_STD_MEDIUM" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:src="@drawable/icon_apply_setting"
+            tools:ignore="ContentDescription" />
+    </FrameLayout>
+
+
+</LinearLayout>

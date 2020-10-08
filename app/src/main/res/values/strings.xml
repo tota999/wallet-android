@@ -330,6 +330,12 @@
     <string name="bridge_settings_configure_custom_bridges_cta">Custom Bridges</string>
     <string name="bridge_settings_page_label">If you are in a country or using a connection that censors Tor, you might need to use bridges.</string>
 
+    <string name="custom_bridge_settings_page_title">Custom Bridges</string>
+    <string name="custom_bridge_settings_paste_bridges_label">Paste Bridges</string>
+    <string name="custom_bridge_settings_request_bridges_cta">Request Bridges from torproject.org</string>
+    <string name="custom_bridge_settings_scan_qr_cta">Scan QR Code</string>
+    <string name="custom_bridge_settings_upload_qr_cta">Upload QR Code</string>
+
     <!-- Wallet back up -->
     <string name="back_up_wallet_page_title">Security</string>
     <string name="back_up_wallet_page_label">Wallet Backups</string>
