@@ -335,6 +335,7 @@
     <string name="custom_bridge_settings_request_bridges_cta">Request Bridges from torproject.org</string>
     <string name="custom_bridge_settings_scan_qr_cta">Scan QR Code</string>
     <string name="custom_bridge_settings_upload_qr_cta">Upload QR Code</string>
+    <string name="custom_bridge_settings_pick_image">Choose an image with Tor bridge settings QR code</string>
 
     <!-- Wallet back up -->
     <string name="back_up_wallet_page_title">Security</string>
