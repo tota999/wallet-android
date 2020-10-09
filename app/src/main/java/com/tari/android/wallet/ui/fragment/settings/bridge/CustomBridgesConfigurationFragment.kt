@@ -49,6 +49,9 @@ framework for UI tree rebuild on configuration changes"""
         ui.uploadBridgesQrCtaView.setOnClickListener(ThrottleClick {
             afterDelay { router.toImageChooser() }
         })
+        ui.requestBridgesCtaView.setOnClickListener(ThrottleClick {
+            afterDelay { router.toBridgesRequest() }
+        })
     }
 
     private fun afterDelay(action: () -> Unit) {
@@ -93,6 +96,7 @@ framework for UI tree rebuild on configuration changes"""
     interface Router {
         fun toQRScanner()
         fun toImageChooser()
+        fun toBridgesRequest()
         fun back()
     }
 

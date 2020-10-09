@@ -11,6 +11,7 @@ import com.tari.android.wallet.ui.activity.qr.QRScannerActivity
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.settings.bridge.BridgesConfigurationFragment
 import com.tari.android.wallet.ui.fragment.settings.bridge.CustomBridgesConfigurationFragment
+import com.tari.android.wallet.ui.fragment.settings.bridge.RequestBridgesDialogFragment
 
 class BridgeConfigurationActivity : AppCompatActivity(), BridgesConfigurationFragment.Router,
     CustomBridgesConfigurationFragment.Router {
@@ -48,6 +49,10 @@ class BridgeConfigurationActivity : AppCompatActivity(), BridgesConfigurationFra
             ), IMAGE_PICKER_REQUEST_CODE
         )
     }
+
+    override fun toBridgesRequest() =
+        RequestBridgesDialogFragment.newInstance()
+            .show(supportFragmentManager, null)
 
     override fun back() = onBackPressed()
 
